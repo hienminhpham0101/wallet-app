@@ -18,12 +18,18 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "."
   },
   "include": [
     "src"
   ],
   "rules": {
-        "camelcase": [2, {"properties": "always"}]
-    }
+    "camelcase": [
+      2,
+      {
+        "properties": "always"
+      }
+    ]
+  }
 }

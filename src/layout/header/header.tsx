@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout } from "antd";
-import "./headerStyles.css";
+import "./headerStyles.scss";
 interface Props {
   collapsed: boolean;
   MenuUnfoldOutlined: React.ForwardRefExoticComponent<Pick<any, string>>;
