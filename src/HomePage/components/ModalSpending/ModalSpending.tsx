@@ -6,9 +6,16 @@ import {
   Form,
   Input,
   InputNumber,
+  message,
   Modal,
   Row,
 } from "antd";
+import locale from "antd/lib/date-picker/locale/en_US";
+import React from "react";
+import { GlobalLoadingContext } from "src/global/contexts/global-loading";
+import { IActivities } from "src/HomePage/model/activities";
+import { STATUS } from "src/HomePage/model/status";
+import { addActivity } from "src/HomePage/services/httpsClient";
 import "./ModalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;
@@ -19,17 +26,32 @@ interface Props {
 export default function ModalSpending(props: Props) {
   const { isModalVisible, handleCancel, handleSubmit } = props;
   const [form] = Form.useForm();
-
-  const onCreate = (values: any) => {
-    console.log("Received values of form: ", values);
+  const { setLoadingState } = React.useContext(GlobalLoadingContext);
+  const onCreate = (activity: IActivities) => {
+    setLoadingState("loading");
+    addActivity(activity)
+      .then((res) => {
+        if (res?.status === STATUS.CREATED) {
+          setTimeout(() => {
+            message.success("Create spending successfully !");
+          }, 1000);
+          handleSubmit();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Error, please try again !");
+      })
+      .finally(() => {
+        setLoadingState("idle");
+      });
   };
-
   const onSubmit = () => {
     form
       .validateFields()
       .then((values) => {
         form.resetFields();
-        onCreate(values);
+        onCreate({ ...values, time: values.time._d });
         handleSubmit();
       })
       .catch((info) => {
@@ -108,7 +130,11 @@ export default function ModalSpending(props: Props) {
                 },
               ]}
             >
-              <DatePicker renderExtraFooter={() => "extra footer"} showTime />
+              <DatePicker
+                locale={locale}
+                renderExtraFooter={() => "extra footer"}
+                showTime
+              />
             </Form.Item>
           </Col>
           <Col span={12}>

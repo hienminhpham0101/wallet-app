@@ -1,1 +1,3 @@
-export const GET_ACTIVITIES = "api/ActivityLogs";
+export const END_POINT = {
+  activities: "api/ActivityLogs",
+};
