@@ -1,14 +1,13 @@
-import NProgress from "nprogress";
 import React, { ComponentType, useState } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Layout, Spin } from "antd";
 import "antd/dist/antd.css";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./assets/styles/styles.scss";
+import { GlobalLoadingProvider } from "./global/contexts/global-loading";
 import Header from "./layout/header/header";
 import SideBar from "./layout/sideBar/sideBar";
 import Routes from "./routes/routes";
-import { GlobalLoadingProvider } from "./global/contexts/global-loading";
 const { Content } = Layout;
 
 interface IRoutes {
@@ -33,7 +32,13 @@ function App() {
       }}
     >
       <Layout style={{ height: "100vh" }}>
-        <React.Suspense fallback={<span>Loading ...</span>}>
+        <React.Suspense
+          fallback={
+            <div className="global-loading">
+              <Spin tip="Loading ..." />
+            </div>
+          }
+        >
           <Router>
             <SideBar collapsed={collapsed} />
             <Layout className="site-layout">

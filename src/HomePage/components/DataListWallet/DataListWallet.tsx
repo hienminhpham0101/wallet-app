@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, Space, Table } from "antd";
+import React, { useContext, useEffect, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
+import { Button, Input, message, Popconfirm, Space, Table } from "antd";
 import Text from "antd/lib/typography/Text";
 import Title from "antd/lib/typography/Title";
-//import {column} from "src/HomePage/constants/columns/columns";
+import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/HomePage/model/activities";
-import ModalSpending from "../ModalSpending/ModalSpending";
 import { IColumns } from "src/HomePage/model/columns";
-import Highlighter from "react-highlight-words";
+import { STATUS } from "src/HomePage/model/status";
+import { removeActivity } from "src/HomePage/services/httpsClient";
+import ModalSpending from "../ModalSpending/ModalSpending";
 interface IDataListWallet {
   isModalVisible: boolean;
   handleCancel: () => void;
@@ -19,9 +20,8 @@ function DataListWallet(props: IDataListWallet) {
   const { activities, isModalVisible, handleCancel, handleSubmit } = props;
   const [data, setData] = useState<IActivities[]>();
   const [totalMoney, setTotalMoney] = useState<number>();
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
-
+  const [rowSelected, setRowSelected] = useState<IActivities>();
+  const { setLoadingState } = useContext(GlobalLoadingContext);
   const formatDate = (dates: Date) => {
     const date = new Date(dates);
     return date
@@ -34,140 +34,9 @@ function DataListWallet(props: IDataListWallet) {
       })
       .replaceAll(",", "/");
   };
-  const getColumnSearchProps = (dataIndex: any) => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }: {
-      setSelectedKeys: any;
-      selectedKeys: string;
-      confirm: string;
-      clearFilters: string;
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={(node) => {
-            //searchInput = node;
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ marginBottom: 8, display: "block" }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            // onClick={() => {
-            //   confirm({ closeDropdown: false });
-            //   setSearchText(selectedKeys), setSearchedColumn(dataIndex);
-            // }}
-          >
-            Filter
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: any) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-    ),
-    onFilter: (value: any, record: any) =>
-      record[dataIndex]
-        ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
-        : "",
-    onFilterDropdownVisibleChange: (visible: any) => {
-      if (visible) {
-        //setTimeout(() => searchInput.select(), 100);
-      }
-    },
-    render: (text: any) =>
-      setSearchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
 
-  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
-    confirm();
-    setSearchText(selectedKeys);
-    setSearchedColumn(dataIndex);
-  };
-
-  const handleReset = (clearFilters: any) => {
-    clearFilters();
-    setSearchText("");
-  };
-
-  const columns: IColumns[] = [
-    {
-      title: "Expenditure",
-      dataIndex: "expenditure",
-      key: "expenditure",
-      ...getColumnSearchProps("expenditure"),
-    },
-    {
-      title: "Cost",
-      dataIndex: "cost",
-      key: "cost",
-      width: "12%",
-      sorter: {
-        compare: (a: any, b: any) => {
-          const first = a.cost.replace(/[VND|,]/g, "");
-          const second = b.cost.replace(/[VND|,]/g, "");
-
-          return Number(first) - Number(second);
-        },
-        multiple: 3,
-      },
-      ...getColumnSearchProps("cost"),
-    },
-    {
-      title: "Time",
-      dataIndex: "time",
-      width: "30%",
-      key: "time",
-      ...getColumnSearchProps("time"),
-    },
-    {
-      title: "Note",
-      dataIndex: "note",
-      width: "30%",
-      key: "note",
-      ...getColumnSearchProps("note"),
-    },
-  ];
   useEffect(() => {
-    if (activities && activities.length) {
+    if (activities) {
       const objectInstance = activities.map((activity: IActivities) => ({
         ...activity,
         key: activity.id,
@@ -176,30 +45,26 @@ function DataListWallet(props: IDataListWallet) {
       }));
       setData([...objectInstance]);
 
-      const total = activities.reduce(
-        (pre: number | any, current: number | any) => pre.cost + current.cost
-      );
-      setTotalMoney(total);
+      if (activities.length > 0) {
+        const total = activities.reduce(
+          (pre: number | any, current: number | any) => {
+            return pre.cost ?? 0 + current.cost;
+          },
+          0
+        );
+        setTotalMoney(total);
+      }
     }
   }, [activities]);
 
   // rowSelection objects indicates the need for row selection
   const rowSelection = {
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
+    onChange: (selectedRowKeys: any, selectedRows: IActivities[]) => {},
     onSelect: (record: any, selected: any, selectedRows: any) => {
-      console.log(record, selected, selectedRows);
+      //console.log(record, selected, selectedRows);
     },
     onSelectAll: (selected: any, selectedRows: any, changeRows: any) => {
-      console.log(selected, selectedRows, changeRows);
-    },
-    onclick: (selected: any, selectedRows: any, changeRows: any) => {
-      console.log(selected, selectedRows, changeRows);
+      //console.log(selected, selectedRows, changeRows);
     },
   };
 
@@ -223,6 +88,139 @@ function DataListWallet(props: IDataListWallet) {
     </Table.Summary.Row>
   );
 
+  const handleSearch = (confirm: () => void) => {
+    confirm();
+  };
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters();
+  };
+  const getColumnSearchProps = (dataIndex: string) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: {
+      setSelectedKeys: (value: string[]) => React.ChangeEvent<HTMLInputElement>;
+      selectedKeys: string;
+      confirm: () => void;
+      clearFilters: () => void;
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
+          }
+          onPressEnter={() => handleSearch(confirm)}
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(confirm)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+
+    filterIcon: (filtered: string) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+
+    onFilter: (value: string, record: any) =>
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : "",
+  });
+
+  const columns: IColumns[] = [
+    {
+      title: "Expenditure",
+      dataIndex: "expenditure",
+      width: "30%",
+      key: "expenditure",
+      ...getColumnSearchProps("expenditure"),
+    },
+    {
+      title: "Cost",
+      dataIndex: "cost",
+      key: "cost",
+      width: "17%",
+      sorter: {
+        compare: (a: { cost: string }, b: { cost: string }) => {
+          const first = a.cost.replace(/[VND|,]/g, "");
+          const second = b.cost.replace(/[VND|,]/g, "");
+          return Number(first) - Number(second);
+        },
+        multiple: 3,
+      },
+      ...getColumnSearchProps("cost"),
+    },
+    {
+      title: "Time",
+      dataIndex: "time",
+      width: "23%",
+      key: "time",
+      ...getColumnSearchProps("time"),
+    },
+    {
+      title: "Note",
+      dataIndex: "note",
+      width: "30%",
+      key: "note",
+      ...getColumnSearchProps("note"),
+    },
+    {
+      title: "Operation",
+      dataIndex: "operation",
+      key: "operation",
+      render: (_: any, record: { key: React.Key }) => (
+        <Popconfirm
+          title="Sure to delete?"
+          onConfirm={() => handleDelete(record.key)}
+        >
+          <a>Delete</a>
+        </Popconfirm>
+      ),
+    },
+  ];
+  const handleDelete = (activityId: React.Key) => {
+    setLoadingState("loading");
+    removeActivity(activityId)
+      .then((res) => {
+        if (res?.status === STATUS.SUCCESS) {
+          setTimeout(() => {
+            message.success("Delete spending successfully !");
+          }, 700);
+          handleSubmit();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Error, please try again !");
+      })
+      .finally(() => {
+        setLoadingState("idle");
+      });
+  };
   return (
     <>
       <Table
@@ -230,6 +228,13 @@ function DataListWallet(props: IDataListWallet) {
         rowSelection={{ ...rowSelection }}
         dataSource={data}
         summary={summaryActivity}
+        onRow={(record: IActivities, rowIndex) => {
+          return {
+            onClick: () => {
+              setRowSelected(record);
+            },
+          };
+        }}
       />
       <ModalSpending
         isModalVisible={isModalVisible}
