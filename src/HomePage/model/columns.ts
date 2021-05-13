@@ -4,4 +4,6 @@ export interface IColumns {
   key: string;
   width?: string;
   sorter?: any;
+  render?: ((text: any) => JSX.Element) | undefined;
+  getColumnSearchProps?: ((text: any) => JSX.Element) | undefined;
 }

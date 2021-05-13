@@ -10,7 +10,7 @@ import {
   Modal,
   Row,
 } from "antd";
-import locale from "antd/lib/date-picker/locale/en_US";
+import locale from "antd/lib/date-picker/locale/vi_VN";
 import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/HomePage/model/activities";
@@ -130,11 +130,7 @@ export default function ModalSpending(props: Props) {
                 },
               ]}
             >
-              <DatePicker
-                locale={locale}
-                renderExtraFooter={() => "extra footer"}
-                showTime
-              />
+              <DatePicker locale={locale} placeholder="Select date" showTime />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -149,7 +145,12 @@ export default function ModalSpending(props: Props) {
               ]}
               hasFeedback
             >
-              <InputNumber style={{ width: "100%" }} />
+              <InputNumber
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                style={{ width: "100%" }}
+              />
             </Form.Item>
           </Col>
         </Row>
