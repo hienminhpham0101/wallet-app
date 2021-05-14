@@ -1,27 +1,55 @@
-import React, { useContext, useEffect, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, message, Popconfirm, Space, Table } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Popconfirm,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import Text from "antd/lib/typography/Text";
 import Title from "antd/lib/typography/Title";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/HomePage/model/activities";
 import { IColumns } from "src/HomePage/model/columns";
 import { STATUS } from "src/HomePage/model/status";
-import { removeActivity } from "src/HomePage/services/httpsClient";
+import {
+  removeActivity,
+  updateActivity,
+} from "src/HomePage/services/httpsClient";
 import ModalSpending from "../ModalSpending/ModalSpending";
+import "./DataListWalletStyles.scss";
 interface IDataListWallet {
   isModalVisible: boolean;
-  handleCancel: () => void;
-  handleSubmit: () => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  onSuccess: () => void;
   activities: IActivities[] | any;
 }
 
+interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+  editing: boolean;
+  dataIndex: string;
+  title: any;
+  inputType: "number" | "text" | "date";
+  record: IActivities;
+  index: number;
+  children: React.ReactNode;
+}
+
 function DataListWallet(props: IDataListWallet) {
-  const { activities, isModalVisible, handleCancel, handleSubmit } = props;
+  const { activities, isModalVisible, onCancel, onSubmit, onSuccess } = props;
+  const { setLoadingState } = useContext(GlobalLoadingContext);
   const [data, setData] = useState<IActivities[]>();
   const [totalMoney, setTotalMoney] = useState<number>();
   const [rowSelected, setRowSelected] = useState<IActivities>();
-  const { setLoadingState } = useContext(GlobalLoadingContext);
+  const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState("");
+
   const formatDate = (dates: Date) => {
     const date = new Date(dates);
     return date
@@ -48,25 +76,13 @@ function DataListWallet(props: IDataListWallet) {
       if (activities.length > 0) {
         const total = activities.reduce(
           (pre: number | any, current: number | any) => {
-            return pre.cost ?? 0 + current.cost;
-          },
-          0
+            return { cost: pre.cost + current.cost };
+          }
         );
-        setTotalMoney(total);
+        setTotalMoney(total.cost);
       }
     }
   }, [activities]);
-
-  // rowSelection objects indicates the need for row selection
-  const rowSelection = {
-    onChange: (selectedRowKeys: any, selectedRows: IActivities[]) => {},
-    onSelect: (record: any, selected: any, selectedRows: any) => {
-      //console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected: any, selectedRows: any, changeRows: any) => {
-      //console.log(selected, selectedRows, changeRows);
-    },
-  };
 
   const summaryActivity = () => (
     <Table.Summary.Row>
@@ -155,15 +171,17 @@ function DataListWallet(props: IDataListWallet) {
     {
       title: "Expenditure",
       dataIndex: "expenditure",
-      width: "30%",
+      width: "25%",
       key: "expenditure",
       ...getColumnSearchProps("expenditure"),
+      editable: true,
+      fixed: "left",
     },
     {
       title: "Cost",
       dataIndex: "cost",
       key: "cost",
-      width: "17%",
+      width: "20%",
       sorter: {
         compare: (a: { cost: string }, b: { cost: string }) => {
           const first = a.cost.replace(/[VND|,]/g, "");
@@ -173,35 +191,83 @@ function DataListWallet(props: IDataListWallet) {
         multiple: 3,
       },
       ...getColumnSearchProps("cost"),
+      editable: true,
     },
     {
       title: "Time",
       dataIndex: "time",
-      width: "23%",
+      width: "20%",
       key: "time",
       ...getColumnSearchProps("time"),
+      editable: true,
     },
     {
       title: "Note",
       dataIndex: "note",
-      width: "30%",
+      width: "20%",
       key: "note",
       ...getColumnSearchProps("note"),
+      editable: true,
     },
     {
       title: "Operation",
       dataIndex: "operation",
       key: "operation",
-      render: (_: any, record: { key: React.Key }) => (
-        <Popconfirm
-          title="Sure to delete?"
-          onConfirm={() => handleDelete(record.key)}
-        >
-          <a>Delete</a>
-        </Popconfirm>
-      ),
+      width: "20%",
+      fixed: "right",
+      render: (_: any, record: IActivities) => {
+        const editable = isEditing(record);
+        return (
+          <>
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => handleDelete(record.key)}
+            >
+              <Typography.Link>Delete</Typography.Link>
+            </Popconfirm>{" "}
+            &nbsp;
+            {editable ? (
+              <span>
+                <Typography.Link
+                  onClick={() => save(record.key)}
+                  style={{ marginRight: 8 }}
+                >
+                  Save
+                </Typography.Link>
+                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                  <Typography.Link>Cancel</Typography.Link>
+                </Popconfirm>
+              </span>
+            ) : (
+              <Typography.Link
+                disabled={editingKey !== ""}
+                onClick={() => edit(record)}
+              >
+                Edit
+              </Typography.Link>
+            )}
+          </>
+        );
+      },
     },
   ];
+
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record: IActivities) => ({
+        record,
+        inputType: col.dataIndex === "cost" ? "number" : "text",
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
+
   const handleDelete = (activityId: React.Key) => {
     setLoadingState("loading");
     removeActivity(activityId)
@@ -210,7 +276,7 @@ function DataListWallet(props: IDataListWallet) {
           setTimeout(() => {
             message.success("Delete spending successfully !");
           }, 700);
-          handleSubmit();
+          onSubmit();
         }
       })
       .catch((err) => {
@@ -221,27 +287,116 @@ function DataListWallet(props: IDataListWallet) {
         setLoadingState("idle");
       });
   };
+
+  const EditableCell: React.FC<EditableCellProps> = ({
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    ...restProps
+  }) => {
+    const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+
+    return (
+      <td {...restProps}>
+        {editing ? (
+          <Form.Item
+            name={dataIndex}
+            style={{ margin: 0 }}
+            rules={[
+              {
+                required: true,
+                message: `Please Input ${title}!`,
+              },
+            ]}
+          >
+            {inputNode}
+          </Form.Item>
+        ) : (
+          children
+        )}
+      </td>
+    );
+  };
+
+  const isEditing = (record: IActivities) => record.key === editingKey;
+
+  const edit = (record: Partial<IActivities> & { key: React.Key }) => {
+    form.setFieldsValue({
+      expenditure: "",
+      cost: "",
+      time: "",
+      note: "",
+      ...record,
+    });
+    setEditingKey(record.key);
+  };
+  const cancel = () => {
+    setEditingKey("");
+  };
+
+  const save = async (key: string) => {
+    try {
+      const row = (await form.validateFields()) as IActivities;
+      setLoadingState("loading");
+      updateActivity(key, { ...row, id: key })
+        .then((res) => {
+          if (res?.status === STATUS.UPDATED) {
+            setTimeout(() => {
+              message.success("Update spending successfully !");
+            }, 800);
+            onSuccess();
+          } else {
+            message.error("Error, please try again !");
+          }
+          setEditingKey("");
+        })
+        .catch((err) => {
+          console.log(err);
+          message.error("Error, please try again !");
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setLoadingState("idle");
+          }, 600);
+        });
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
   return (
-    <>
+    <Form form={form} component={false}>
       <Table
-        columns={columns}
-        rowSelection={{ ...rowSelection }}
+        columns={mergedColumns}
         dataSource={data}
+        rowClassName="editable-row"
         summary={summaryActivity}
-        onRow={(record: IActivities, rowIndex) => {
+        bordered
+        onRow={(record: IActivities) => {
           return {
             onClick: () => {
               setRowSelected(record);
             },
           };
         }}
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+        pagination={{
+          onChange: cancel,
+        }}
       />
       <ModalSpending
         isModalVisible={isModalVisible}
-        handleSubmit={handleSubmit}
-        handleCancel={handleCancel}
+        handleSubmit={onSubmit}
+        handleCancel={onCancel}
       />
-    </>
+    </Form>
   );
 }
 export default DataListWallet;

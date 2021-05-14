@@ -24,12 +24,11 @@
   "include": [
     "src"
   ],
-  "rules": {
-    "camelcase": [
-      2,
-      {
-        "properties": "always"
-      }
-    ]
-  }
+  "@typescript-eslint/naming-convention": [
+    "error",
+    {
+      "selector": "variable",
+      "format": ["camelcase", "UPPER_CASE"]
+    }
+  ]
 }

@@ -34,13 +34,14 @@ export default function ModalSpending(props: Props) {
         if (res?.status === STATUS.CREATED) {
           setTimeout(() => {
             message.success("Create spending successfully !");
-          }, 1000);
+          }, 800);
           handleSubmit();
+        } else {
+          message.error("Error, please try again !");
         }
       })
       .catch((err) => {
         console.log(err);
-        message.error("Error, please try again !");
       })
       .finally(() => {
         setLoadingState("idle");
@@ -69,8 +70,7 @@ export default function ModalSpending(props: Props) {
     ]);
     if (expenditure && time && cost) {
       return Modal.confirm({
-        title: "Do you Want to delete these items?",
-        content: "Some descriptions",
+        title: "Are you sure you want to discard all data?",
         icon: <ExclamationCircleOutlined />,
         onOk() {
           form.resetFields();
@@ -155,7 +155,7 @@ export default function ModalSpending(props: Props) {
           </Col>
         </Row>
         <Form.Item name="note" label="Note :">
-          <Input.TextArea rows={3} />
+          <Input.TextArea rows={3} showCount maxLength={250} allowClear />
         </Form.Item>
         <div style={{ marginBottom: "20px" }}></div>
       </Form>

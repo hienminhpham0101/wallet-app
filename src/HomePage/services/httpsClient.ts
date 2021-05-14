@@ -31,3 +31,18 @@ export const removeActivity = async (activityId: React.Key) => {
     console.log(error);
   }
 };
+
+export const updateActivity = async (
+  activityId: React.Key,
+  data: IActivities
+) => {
+  try {
+    const response = await axios.put(
+      `${url}/${END_POINT.activities}/${activityId}`,
+      data
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

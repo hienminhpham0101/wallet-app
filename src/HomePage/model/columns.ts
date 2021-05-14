@@ -6,4 +6,8 @@ export interface IColumns {
   sorter?: any;
   render?: any;
   getColumnSearchProps?: ((text: any) => JSX.Element) | undefined;
+  editable?: boolean;
+
+  fixed?: fixed;
 }
+type fixed = "left" | "right";

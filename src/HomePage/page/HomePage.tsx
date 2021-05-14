@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "antd";
-import DataListWallet from "../components/DataListWallet/DataListWallet";
-import { getActivities } from "../services/httpsClient";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { IActivities } from "../model/activities";
+import { Button } from "antd";
+import React, { useEffect, useState } from "react";
+import DataListWallet from "../components/DataListWallet/DataListWallet";
 import { Status } from "../constants/responseStatus/status";
+import { IActivities } from "../model/activities";
+import { getActivities } from "../services/httpsClient";
 export default function HomePage() {
   const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
   const [activities, setActivities] = useState<IActivities[]>();
@@ -12,6 +12,9 @@ export default function HomePage() {
 
   const handleSubmit = () => {
     setIsModalVisible(false);
+    setForcedReload((pre) => !pre);
+  };
+  const handleSuccess = () => {
     setForcedReload((pre) => !pre);
   };
 
@@ -43,8 +46,9 @@ export default function HomePage() {
       </div>
       <DataListWallet
         isModalVisible={isModalVisible}
-        handleSubmit={handleSubmit}
-        handleCancel={handleCancel}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        onSuccess={handleSuccess}
         activities={activities}
       />
     </div>
