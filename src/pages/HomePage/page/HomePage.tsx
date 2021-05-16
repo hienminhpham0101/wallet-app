@@ -1,5 +1,6 @@
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, PageHeader } from "antd";
+import "./homePageStyles.scss";
 import React, { useEffect, useState } from "react";
 import DataListWallet from "../components/DataListWallet/DataListWallet";
 import { Status } from "../constants/responseStatus/status";
@@ -34,16 +35,23 @@ export default function HomePage() {
   }, [forcedReload]);
 
   return (
-    <div>
-      <div className="d-flex align-items-center justify-content-between mb-2">
-        <Button
-          type="primary"
-          icon={<PlusCircleOutlined />}
-          onClick={() => setIsModalVisible(true)}
-        >
-          New Spending
-        </Button>
-      </div>
+    <>
+      <PageHeader
+        ghost={false}
+        onBack={() => window.history.back()}
+        title="Title"
+        subTitle="This is a subtitle"
+        extra={[
+          <Button
+            type="primary"
+            key="add"
+            icon={<PlusCircleOutlined />}
+            onClick={() => setIsModalVisible(true)}
+          >
+            New Spending
+          </Button>,
+        ]}
+      ></PageHeader>
       <DataListWallet
         isModalVisible={isModalVisible}
         onSubmit={handleSubmit}
@@ -51,6 +59,6 @@ export default function HomePage() {
         onSuccess={handleSuccess}
         activities={activities}
       />
-    </div>
+    </>
   );
 }

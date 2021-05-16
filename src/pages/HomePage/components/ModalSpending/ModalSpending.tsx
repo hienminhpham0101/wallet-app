@@ -13,9 +13,9 @@ import {
 import locale from "antd/lib/date-picker/locale/vi_VN";
 import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
-import { IActivities } from "src/HomePage/model/activities";
-import { STATUS } from "src/HomePage/model/status";
-import { addActivity } from "src/HomePage/services/httpsClient";
+import { IActivities } from "src/pages/HomePage/model/activities";
+import { STATUS } from "src/pages/HomePage/model/status";
+import { addActivity } from "src/pages/HomePage/services/httpsClient";
 import "./ModalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;
@@ -50,9 +50,9 @@ export default function ModalSpending(props: Props) {
   const onSubmit = () => {
     form
       .validateFields()
-      .then((values) => {
+      .then((values: IActivities) => {
         form.resetFields();
-        onCreate({ ...values, time: values.time._d });
+        onCreate(values);
         handleSubmit();
       })
       .catch((info) => {

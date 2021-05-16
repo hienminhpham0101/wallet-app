@@ -1,6 +1,7 @@
 import { SearchOutlined } from "@ant-design/icons";
 import {
   Button,
+  DatePicker,
   Form,
   Input,
   InputNumber,
@@ -12,15 +13,16 @@ import {
 } from "antd";
 import Text from "antd/lib/typography/Text";
 import Title from "antd/lib/typography/Title";
+import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
-import { IActivities } from "src/HomePage/model/activities";
-import { IColumns } from "src/HomePage/model/columns";
-import { STATUS } from "src/HomePage/model/status";
+import { IActivities } from "src/pages/HomePage/model/activities";
+import { IColumns } from "src/pages/HomePage/model/columns";
+import { STATUS } from "src/pages/HomePage/model/status";
 import {
   removeActivity,
   updateActivity,
-} from "src/HomePage/services/httpsClient";
+} from "src/pages/HomePage/services/httpsClient";
 import ModalSpending from "../ModalSpending/ModalSpending";
 import "./DataListWalletStyles.scss";
 interface IDataListWallet {
@@ -34,10 +36,11 @@ interface IDataListWallet {
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
-  title: any;
+  title: string;
   inputType: "number" | "text" | "date";
   record: IActivities;
   index: number;
+  required: boolean;
   children: React.ReactNode;
 }
 
@@ -46,22 +49,9 @@ function DataListWallet(props: IDataListWallet) {
   const { setLoadingState } = useContext(GlobalLoadingContext);
   const [data, setData] = useState<IActivities[]>();
   const [totalMoney, setTotalMoney] = useState<number>();
-  const [rowSelected, setRowSelected] = useState<IActivities>();
+  const [, setRowSelected] = useState<IActivities>();
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-
-  const formatDate = (dates: Date) => {
-    const date = new Date(dates);
-    return date
-      .toLocaleString("en-US", {
-        day: "numeric",
-        year: "numeric",
-        month: "long",
-        hour: "numeric",
-        minute: "numeric",
-      })
-      .replaceAll(",", "/");
-  };
 
   useEffect(() => {
     if (activities) {
@@ -69,7 +59,7 @@ function DataListWallet(props: IDataListWallet) {
         ...activity,
         key: activity.id,
         cost: new Intl.NumberFormat().format(activity.cost) + " VND",
-        time: formatDate(activity.time),
+        time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
       }));
       setData([...objectInstance]);
 
@@ -82,6 +72,9 @@ function DataListWallet(props: IDataListWallet) {
         setTotalMoney(total.cost);
       }
     }
+    return () => {
+      setData([]);
+    };
   }, [activities]);
 
   const summaryActivity = () => (
@@ -89,8 +82,7 @@ function DataListWallet(props: IDataListWallet) {
       <Table.Summary.Cell index={0}>
         <Title level={5}>Total:</Title>
       </Table.Summary.Cell>
-      <Table.Summary.Cell index={1}></Table.Summary.Cell>
-      <Table.Summary.Cell index={2}>
+      <Table.Summary.Cell index={1} colSpan={4}>
         {totalMoney && (
           <Title level={5}>
             <Text strong type="danger">
@@ -99,8 +91,6 @@ function DataListWallet(props: IDataListWallet) {
           </Title>
         )}
       </Table.Summary.Cell>
-      <Table.Summary.Cell index={3}></Table.Summary.Cell>
-      <Table.Summary.Cell index={4}></Table.Summary.Cell>
     </Table.Summary.Row>
   );
 
@@ -124,15 +114,23 @@ function DataListWallet(props: IDataListWallet) {
       clearFilters: () => void;
     }) => (
       <div style={{ padding: 8 }}>
-        <Input
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
-          }
-          onPressEnter={() => handleSearch(confirm)}
-          style={{ marginBottom: 8, display: "block" }}
-        />
+        {dataIndex === "time" ? (
+          <DatePicker.RangePicker
+            className="mb-8 d-flex"
+            onChange={(e) => console.log(e)}
+          />
+        ) : (
+          <Input
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
+            }
+            onPressEnter={() => handleSearch(confirm)}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+        )}
+
         <Space>
           <Button
             type="primary"
@@ -176,6 +174,8 @@ function DataListWallet(props: IDataListWallet) {
       ...getColumnSearchProps("expenditure"),
       editable: true,
       fixed: "left",
+      type: "text",
+      required: true,
     },
     {
       title: "Cost",
@@ -192,6 +192,8 @@ function DataListWallet(props: IDataListWallet) {
       },
       ...getColumnSearchProps("cost"),
       editable: true,
+      type: "number",
+      required: true,
     },
     {
       title: "Time",
@@ -200,6 +202,8 @@ function DataListWallet(props: IDataListWallet) {
       key: "time",
       ...getColumnSearchProps("time"),
       editable: true,
+      type: "date",
+      required: true,
     },
     {
       title: "Note",
@@ -208,6 +212,8 @@ function DataListWallet(props: IDataListWallet) {
       key: "note",
       ...getColumnSearchProps("note"),
       editable: true,
+      type: "text",
+      required: false,
     },
     {
       title: "Operation",
@@ -219,21 +225,15 @@ function DataListWallet(props: IDataListWallet) {
         const editable = isEditing(record);
         return (
           <>
-            <Popconfirm
-              title="Sure to delete?"
-              onConfirm={() => handleDelete(record.key)}
-            >
-              <Typography.Link>Delete</Typography.Link>
-            </Popconfirm>{" "}
-            &nbsp;
             {editable ? (
               <span>
                 <Typography.Link
                   onClick={() => save(record.key)}
-                  style={{ marginRight: 8 }}
+                  style={{ marginRight: 5 }}
                 >
                   Save
                 </Typography.Link>
+                <span className="separate">|</span>
                 <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
                   <Typography.Link>Cancel</Typography.Link>
                 </Popconfirm>
@@ -246,6 +246,13 @@ function DataListWallet(props: IDataListWallet) {
                 Edit
               </Typography.Link>
             )}
+            <span className="separate">|</span>
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => handleDelete(record.key)}
+            >
+              <Typography.Link>Delete</Typography.Link>
+            </Popconfirm>{" "}
           </>
         );
       },
@@ -260,10 +267,11 @@ function DataListWallet(props: IDataListWallet) {
       ...col,
       onCell: (record: IActivities) => ({
         record,
-        inputType: col.dataIndex === "cost" ? "number" : "text",
+        inputType: col.type,
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
+        required: col.required,
       }),
     };
   });
@@ -287,7 +295,9 @@ function DataListWallet(props: IDataListWallet) {
         setLoadingState("idle");
       });
   };
-
+  function disabledDate(current: any) {
+    return current && current.valueOf() > Date.now();
+  }
   const EditableCell: React.FC<EditableCellProps> = ({
     editing,
     dataIndex,
@@ -296,10 +306,34 @@ function DataListWallet(props: IDataListWallet) {
     record,
     index,
     children,
+    required,
     ...restProps
   }) => {
-    const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
-
+    let inputNode: JSX.Element = <></>;
+    switch (inputType) {
+      case "text":
+        inputNode = <Input />;
+        break;
+      case "number":
+        inputNode = (
+          <InputNumber
+            formatter={(value) =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+          />
+        );
+        break;
+      case "date":
+        inputNode = (
+          <DatePicker
+            disabledDate={(current) => disabledDate(current)}
+            format="MM/DD/YYYY HH:mm:ss"
+            placeholder="Select date"
+            showTime
+          />
+        );
+        break;
+    }
     return (
       <td {...restProps}>
         {editing ? (
@@ -308,7 +342,7 @@ function DataListWallet(props: IDataListWallet) {
             style={{ margin: 0 }}
             rules={[
               {
-                required: true,
+                required: required ? true : false,
                 message: `Please Input ${title}!`,
               },
             ]}
@@ -326,11 +360,9 @@ function DataListWallet(props: IDataListWallet) {
 
   const edit = (record: Partial<IActivities> & { key: React.Key }) => {
     form.setFieldsValue({
-      expenditure: "",
-      cost: "",
-      time: "",
-      note: "",
       ...record,
+      cost: record.cost?.toString().replace(/[VND|,]/g, ""),
+      time: moment(record.time),
     });
     setEditingKey(record.key);
   };
@@ -340,9 +372,14 @@ function DataListWallet(props: IDataListWallet) {
 
   const save = async (key: string) => {
     try {
-      const row = (await form.validateFields()) as IActivities;
+      const values = (await form.validateFields()) as IActivities;
+      const objectInstance = {
+        ...values,
+        cost: Number(values.cost),
+        time: moment(values.time.format("MM/DD/YYYY HH:mm:ss")),
+      };
       setLoadingState("loading");
-      updateActivity(key, { ...row, id: key })
+      updateActivity(key, { ...objectInstance, id: key })
         .then((res) => {
           if (res?.status === STATUS.UPDATED) {
             setTimeout(() => {
@@ -374,6 +411,7 @@ function DataListWallet(props: IDataListWallet) {
         dataSource={data}
         rowClassName="editable-row"
         summary={summaryActivity}
+        pagination={false}
         bordered
         onRow={(record: IActivities) => {
           return {
@@ -387,9 +425,8 @@ function DataListWallet(props: IDataListWallet) {
             cell: EditableCell,
           },
         }}
-        pagination={{
-          onChange: cancel,
-        }}
+        scroll={{ y: 800 }}
+        sticky
       />
       <ModalSpending
         isModalVisible={isModalVisible}

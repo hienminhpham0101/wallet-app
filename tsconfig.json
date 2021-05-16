@@ -24,11 +24,38 @@
   "include": [
     "src"
   ],
+  "exclude": ["node_modules","tmp","build"],
   "@typescript-eslint/naming-convention": [
-    "error",
-    {
-      "selector": "variable",
-      "format": ["camelcase", "UPPER_CASE"]
-    }
-  ]
+      "error",
+      {
+        "selector": "function",
+        "format": ["camelCase", "PascalCase"]
+      },
+      {
+        "selector": "default",
+        "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+      },
+
+      {
+        "selector": "variable",
+        "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow"
+      },
+      {
+        "selector": "memberLike",
+        "modifiers": ["private"],
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow"
+      },
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      },
+
+    ],
+    "@typescript-eslint/no-empty-interface": "warn",
 }
