@@ -24,6 +24,7 @@ function App() {
   };
   const [loadingState, setLoadingState] =
     useState<"init" | "loading" | "idle">("init");
+
   return (
     <GlobalLoadingProvider
       value={{
@@ -31,7 +32,7 @@ function App() {
         setLoadingState,
       }}
     >
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout className={`layout ${collapsed ? "collapsed" : null}`}>
         <React.Suspense
           fallback={
             <div className="global-loading">
@@ -48,14 +49,7 @@ function App() {
                 MenuUnfoldOutlined={MenuUnfoldOutlined}
                 toggleCollapse={toggleCollapse}
               />
-              <Content
-                className="site-layout-background"
-                style={{
-                  margin: "24px 16px",
-                  padding: 24,
-                  minHeight: 280,
-                }}
-              >
+              <Content className="site-layout-background site-layout-custom">
                 <Switch>
                   {Routes &&
                     Routes.map((route: IRoutes) => (

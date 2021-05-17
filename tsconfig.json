@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,41 +17,38 @@
     "jsx": "react-jsx",
     "baseUrl": "."
   },
-  "include": [
-    "src"
-  ],
-  "exclude": ["node_modules","tmp","build"],
+  "exclude": ["node_modules", "typings"],
+  "include": ["src"],
   "@typescript-eslint/naming-convention": [
-      "error",
-      {
-        "selector": "function",
-        "format": ["camelCase", "PascalCase"]
-      },
-      {
-        "selector": "default",
-        "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
-      },
+    "error",
+    {
+      "selector": "function",
+      "format": ["camelCase", "PascalCase"]
+    },
+    {
+      "selector": "default",
+      "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+    },
 
-      {
-        "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
-      },
-      {
-        "selector": "parameter",
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-      {
-        "selector": "memberLike",
-        "modifiers": ["private"],
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-      {
-        "selector": "typeLike",
-        "format": ["PascalCase"]
-      },
-
-    ],
-    "@typescript-eslint/no-empty-interface": "warn",
+    {
+      "selector": "variable",
+      "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+    },
+    {
+      "selector": "parameter",
+      "format": ["camelCase"],
+      "leadingUnderscore": "allow"
+    },
+    {
+      "selector": "memberLike",
+      "modifiers": ["private"],
+      "format": ["camelCase"],
+      "leadingUnderscore": "allow"
+    },
+    {
+      "selector": "typeLike",
+      "format": ["PascalCase"]
+    }
+  ],
+  "@typescript-eslint/no-empty-interface": "warn"
 }

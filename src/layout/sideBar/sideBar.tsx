@@ -10,7 +10,12 @@ const { Sider } = Layout;
 export default function SideBar(props: Props) {
   const { collapsed } = props;
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
+    <Sider
+      className="side-bar"
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+    >
       <div className="logo"></div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
         <Menu.Item key="1" icon={<HomeOutlined />}>

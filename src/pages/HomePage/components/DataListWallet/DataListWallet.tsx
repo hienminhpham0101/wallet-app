@@ -47,7 +47,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
 function DataListWallet(props: IDataListWallet) {
   const { activities, isModalVisible, onCancel, onSubmit, onSuccess } = props;
   const { setLoadingState } = useContext(GlobalLoadingContext);
-  const [data, setData] = useState<IActivities[]>();
+  const [data, setData] = useState<IActivities[] | undefined>();
   const [totalMoney, setTotalMoney] = useState<number>();
   const [, setRowSelected] = useState<IActivities>();
   const [form] = Form.useForm();
@@ -406,28 +406,30 @@ function DataListWallet(props: IDataListWallet) {
   };
   return (
     <Form form={form} component={false}>
-      <Table
-        columns={mergedColumns}
-        dataSource={data}
-        rowClassName="editable-row"
-        summary={summaryActivity}
-        pagination={false}
-        bordered
-        onRow={(record: IActivities) => {
-          return {
-            onClick: () => {
-              setRowSelected(record);
+      {data && data.length && (
+        <Table
+          columns={mergedColumns}
+          dataSource={data}
+          rowClassName="editable-row"
+          summary={summaryActivity}
+          pagination={false}
+          bordered
+          onRow={(record: IActivities) => {
+            return {
+              onClick: () => {
+                setRowSelected(record);
+              },
+            };
+          }}
+          components={{
+            body: {
+              cell: EditableCell,
             },
-          };
-        }}
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-        scroll={{ y: 800 }}
-        sticky
-      />
+          }}
+          scroll={{ y: 800 }}
+          sticky
+        />
+      )}
       <ModalSpending
         isModalVisible={isModalVisible}
         handleSubmit={onSubmit}

@@ -25,3 +25,32 @@
     place-content: center;
     place-items: center;
 }
+.layout {
+    margin-left: 200px;
+    min-height: 100vh;
+}
+.side-bar {
+    overflow: auto;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+}
+.ant-layout-header {
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    background: white;
+}
+.site-layout-custom {
+    margin: 24px 16px;
+    padding: 24px !important;
+    min-height: 280px;
+    margin-top: 84px !important;
+}
+.ant-table-sticky-header {
+    top: 60px !important;
+}
+.collapsed {
+    margin-left: 80px;
+    transition: 0.2s;
+}
