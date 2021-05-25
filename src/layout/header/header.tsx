@@ -10,12 +10,8 @@ interface Props {
 
 export default function Header(props: Props) {
   const { Header } = Layout;
-  const {
-    collapsed,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    toggleCollapse,
-  } = props;
+  const { collapsed, MenuUnfoldOutlined, MenuFoldOutlined, toggleCollapse } =
+    props;
   return (
     <Header className="site-layout-background">
       {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {

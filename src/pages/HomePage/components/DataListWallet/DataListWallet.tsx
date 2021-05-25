@@ -17,7 +17,11 @@ import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/pages/HomePage/model/activities";
-import { IColumns } from "src/pages/HomePage/model/columns";
+import {
+  ActivityKey,
+  EditableCellProps,
+  IColumns,
+} from "src/pages/HomePage/model/columns";
 import { STATUS } from "src/pages/HomePage/model/status";
 import {
   removeActivity,
@@ -31,17 +35,6 @@ interface IDataListWallet {
   onSubmit: () => void;
   onSuccess: () => void;
   activities: IActivities[] | any;
-}
-
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: string;
-  inputType: "number" | "text" | "date";
-  record: IActivities;
-  index: number;
-  required: boolean;
-  children: React.ReactNode;
 }
 
 function DataListWallet(props: IDataListWallet) {
@@ -101,6 +94,18 @@ function DataListWallet(props: IDataListWallet) {
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
   };
+
+  const handleDateTime = (e: any) => {
+    if (e) {
+      const startDate = moment(e[0]).format("MM/DD/YYYY hh:mm");
+      const endDate = moment(e[1]).format("MM/DD/YYYY hh:mm");
+      const rangeDate = activities.filter((activity: IActivities) =>
+        moment(activity.time).isBetween(startDate, endDate)
+      );
+      setData(rangeDate);
+    }
+  };
+
   const getColumnSearchProps = (dataIndex: string) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -112,12 +117,12 @@ function DataListWallet(props: IDataListWallet) {
       selectedKeys: string;
       confirm: () => void;
       clearFilters: () => void;
-    }) => (
-      <div style={{ padding: 8 }}>
+    }): JSX.Element => (
+      <div className="pd-1">
         {dataIndex === "time" ? (
           <DatePicker.RangePicker
             className="mb-8 d-flex"
-            onChange={(e) => console.log(e)}
+            onChange={(e) => handleDateTime(e)}
           />
         ) : (
           <Input
@@ -127,34 +132,27 @@ function DataListWallet(props: IDataListWallet) {
               setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
             }
             onPressEnter={() => handleSearch(confirm)}
-            style={{ marginBottom: 8, display: "block" }}
+            className="d-block mb-1"
           />
         )}
 
-        <Space>
+        <Space className="mt-1">
           <Button
             type="primary"
             onClick={() => handleSearch(confirm)}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90 }}
           >
             Search
           </Button>
-          <Button
-            onClick={() => handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
+          <Button onClick={() => handleReset(clearFilters)} size="small">
             Reset
           </Button>
         </Space>
       </div>
     ),
 
-    filterIcon: (filtered: string) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-    ),
+    filterIcon: (filtered: string) => <SearchOutlined />,
 
     onFilter: (value: string, record: any) =>
       record[dataIndex]
@@ -167,20 +165,20 @@ function DataListWallet(props: IDataListWallet) {
 
   const columns: IColumns[] = [
     {
-      title: "Expenditure",
-      dataIndex: "expenditure",
+      title: ActivityKey.Expenditure,
+      dataIndex: ActivityKey.Expenditure,
       width: "25%",
-      key: "expenditure",
-      ...getColumnSearchProps("expenditure"),
+      key: ActivityKey.Expenditure,
+      ...getColumnSearchProps(ActivityKey.Expenditure),
       editable: true,
       fixed: "left",
       type: "text",
       required: true,
     },
     {
-      title: "Cost",
-      dataIndex: "cost",
-      key: "cost",
+      title: ActivityKey.Cost,
+      dataIndex: ActivityKey.Cost,
+      key: ActivityKey.Cost,
       width: "20%",
       sorter: {
         compare: (a: { cost: string }, b: { cost: string }) => {
@@ -190,33 +188,33 @@ function DataListWallet(props: IDataListWallet) {
         },
         multiple: 3,
       },
-      ...getColumnSearchProps("cost"),
+      ...getColumnSearchProps(ActivityKey.Cost),
       editable: true,
       type: "number",
       required: true,
     },
     {
-      title: "Time",
-      dataIndex: "time",
+      title: ActivityKey.Time,
+      dataIndex: ActivityKey.Time,
       width: "20%",
-      key: "time",
-      ...getColumnSearchProps("time"),
+      key: ActivityKey.Time,
+      ...getColumnSearchProps(ActivityKey.Time),
       editable: true,
       type: "date",
       required: true,
     },
     {
-      title: "Note",
-      dataIndex: "note",
+      title: ActivityKey.Note,
+      dataIndex: ActivityKey.Note,
       width: "20%",
-      key: "note",
-      ...getColumnSearchProps("note"),
+      key: ActivityKey.Note,
+      ...getColumnSearchProps(ActivityKey.Note),
       editable: true,
       type: "text",
       required: false,
     },
     {
-      title: "Operation",
+      title: "operation",
       dataIndex: "operation",
       key: "operation",
       width: "20%",
@@ -224,13 +222,10 @@ function DataListWallet(props: IDataListWallet) {
       render: (_: any, record: IActivities) => {
         const editable = isEditing(record);
         return (
-          <>
+          <React.Fragment>
             {editable ? (
               <span>
-                <Typography.Link
-                  onClick={() => save(record.key)}
-                  style={{ marginRight: 5 }}
-                >
+                <Typography.Link onClick={() => save(record.key)}>
                   Save
                 </Typography.Link>
                 <span className="separate">|</span>
@@ -253,7 +248,7 @@ function DataListWallet(props: IDataListWallet) {
             >
               <Typography.Link>Delete</Typography.Link>
             </Popconfirm>{" "}
-          </>
+          </React.Fragment>
         );
       },
     },
@@ -339,7 +334,7 @@ function DataListWallet(props: IDataListWallet) {
         {editing ? (
           <Form.Item
             name={dataIndex}
-            style={{ margin: 0 }}
+            className="mb-0"
             rules={[
               {
                 required: required ? true : false,
@@ -426,7 +421,6 @@ function DataListWallet(props: IDataListWallet) {
               cell: EditableCell,
             },
           }}
-          scroll={{ y: 800 }}
           sticky
         />
       )}

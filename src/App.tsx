@@ -1,14 +1,13 @@
-import React, { ComponentType, useState } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import "antd/dist/antd.css";
-import "./assets/styles/styles.scss";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Spin } from "antd";
+import "antd/dist/antd.css";
+import React, { ComponentType, useState } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import "./assets/styles/styles.scss";
 import { GlobalLoadingProvider } from "./global/contexts/global-loading";
 import Header from "./layout/header/header";
 import SideBar from "./layout/sideBar/sideBar";
 import Routes from "./routes/routes";
-
 const { Content } = Layout;
 interface IRoutes {
   id: number;
@@ -36,7 +35,7 @@ function App() {
         <React.Suspense
           fallback={
             <div className="global-loading">
-              <Spin tip="Loading ..." />
+              <Spin size="large" tip="Loading ..." />
             </div>
           }
         >

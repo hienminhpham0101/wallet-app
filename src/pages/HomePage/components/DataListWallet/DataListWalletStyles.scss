@@ -9,3 +9,6 @@
 .separate {
     padding: 0 5px;
 }
+.ant-table-thead > tr > th {
+    text-transform: capitalize;
+}

@@ -1,3 +1,5 @@
+import { IActivities } from "./activities";
+
 export interface IColumns {
   title: string;
   dataIndex: string;
@@ -12,5 +14,22 @@ export interface IColumns {
 
   required?: boolean;
 }
+export enum ActivityKey {
+  Expenditure = "expenditure",
+  Cost = "cost",
+  Time = "time",
+  Note = "note",
+}
 type fixed = "left" | "right";
 type type = "text" | "number" | "date";
+
+export interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+  editing: boolean;
+  dataIndex: string;
+  title: string;
+  inputType: "number" | "text" | "date";
+  record: IActivities;
+  index: number;
+  required: boolean;
+  children: React.ReactNode;
+}

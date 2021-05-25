@@ -1,12 +1,14 @@
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { Button, PageHeader } from "antd";
-import "./homePageStyles.scss";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import DataListWallet from "../components/DataListWallet/DataListWallet";
 import { Status } from "../constants/responseStatus/status";
 import { IActivities } from "../model/activities";
 import { getActivities } from "../services/httpsClient";
+import "./homePageStyles.scss";
 export default function HomePage() {
+  const { setLoadingState } = useContext(GlobalLoadingContext);
   const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
   const [activities, setActivities] = useState<IActivities[]>();
   const [forcedReload, setForcedReload] = useState(false);
@@ -24,6 +26,7 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    setLoadingState("loading");
     getActivities()
       .then((res: any) => {
         const { status, data } = res;
@@ -31,11 +34,12 @@ export default function HomePage() {
           setActivities([...data]);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoadingState("idle"));
   }, [forcedReload]);
 
   return (
-    <>
+    <React.Fragment>
       <PageHeader
         ghost={false}
         onBack={() => window.history.back()}
@@ -45,10 +49,11 @@ export default function HomePage() {
           <Button
             type="primary"
             key="add"
+            size="large"
             icon={<PlusCircleOutlined />}
             onClick={() => setIsModalVisible(true)}
           >
-            New Spending
+            Spending
           </Button>,
         ]}
       ></PageHeader>
@@ -59,6 +64,6 @@ export default function HomePage() {
         onSuccess={handleSuccess}
         activities={activities}
       />
-    </>
+    </React.Fragment>
   );
 }

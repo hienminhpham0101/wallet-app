@@ -1,5 +1,9 @@
+@import "../../shared/variables.scss";
 .d-flex {
     display: flex;
+}
+.d-block {
+    display: block;
 }
 .align-items-center {
     align-items: center;
@@ -12,6 +16,12 @@
 }
 .mb-8 {
     margin-bottom: 8px;
+}
+.mb-0 {
+    margin-bottom: 0;
+}
+.mt-1 {
+    margin-top: 0.5rem;
 }
 .global-loading {
     position: fixed;
@@ -26,20 +36,14 @@
     place-items: center;
 }
 .layout {
-    margin-left: 200px;
+    margin-left: 250px;
     min-height: 100vh;
-}
-.side-bar {
-    overflow: auto;
-    height: 100vh;
-    position: fixed;
-    left: 0;
 }
 .ant-layout-header {
     position: fixed;
     width: 100%;
     z-index: 100;
-    background: white;
+    background: $color-white;
 }
 .site-layout-custom {
     margin: 24px 16px;
@@ -53,4 +57,67 @@
 .collapsed {
     margin-left: 80px;
     transition: 0.2s;
+}
+.pd-1 {
+    padding: 0.5rem;
+}
+.ant-btn:hover,
+.ant-btn:focus,
+.ant-menu-item:hover {
+    color: $color-primary4;
+    border-color: $color-primary4;
+}
+.ant-btn-primary {
+    color: $color-white;
+    background-color: $color-primary4;
+    border-color: $color-primary4;
+    &:hover,
+    &:active {
+        color: $color-white;
+        background-color: $color-primary5 !important;
+        border-color: $color-primary5 !important;
+    }
+    &:focus {
+        color: $color-white;
+        background-color: $color-primary6;
+        border-color: $color-primary6;
+    }
+}
+.ant-input:hover,
+.ant-input-number:hover,
+.ant-picker:hover {
+    border-color: $color-primary6;
+}
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-number:focus,
+.ant-input-number-focused,
+.ant-picker-focused {
+    border-color: $color-primary6;
+    box-shadow: 0 0 0 2px #3ecca433;
+}
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border: 1px solid $color-primary5;
+}
+a,
+a.ant-typography,
+.ant-typography a {
+    color: $color-primary5;
+    &:hover {
+        color: $color-primary4;
+    }
+}
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-spin-dot-item {
+    background-color: $color-primary5;
+}
+.ant-picker-time-panel-column > li.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+    background-color: $color-primary10;
+}
+.ant-spin,
+.ant-page-header-back-button:hover {
+    color: $color-primary5;
+}
+.ant-picker-range .ant-picker-active-bar {
+    background: $color-primary5;
 }
