@@ -121,3 +121,28 @@ a.ant-typography,
 .ant-picker-range .ant-picker-active-bar {
     background: $color-primary5;
 }
+.dark-mode {
+    .ant-layout-header {
+        background-color: $color-primary !important;
+        .trigger {
+            color: $color-white;
+        }
+    }
+    .ant-layout,
+    .site-layout .site-layout-background {
+        color: $color-white;
+        background-color: $color-primary !important;
+    }
+    .ant-page-header,
+    table *,
+    .ant-table-body * {
+        background-color: $color-primary !important;
+        * {
+            color: $color-white;
+        }
+    }
+    button.ant-btn {
+        background-color: $color-orange;
+        border-color: $color-orange;
+    }
+}

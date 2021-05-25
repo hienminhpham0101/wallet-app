@@ -5,6 +5,7 @@ import React, { ComponentType, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./assets/styles/styles.scss";
 import { GlobalLoadingProvider } from "./global/contexts/global-loading";
+import useDarkMode from "./hooks/useDarkMode";
 import Header from "./layout/header/header";
 import SideBar from "./layout/sideBar/sideBar";
 import Routes from "./routes/routes";
@@ -23,6 +24,7 @@ function App() {
   };
   const [loadingState, setLoadingState] =
     useState<"init" | "loading" | "idle">("init");
+  const [darkMode, setDarkMode] = useDarkMode();
 
   return (
     <GlobalLoadingProvider
@@ -47,6 +49,8 @@ function App() {
                 MenuFoldOutlined={MenuFoldOutlined}
                 MenuUnfoldOutlined={MenuUnfoldOutlined}
                 toggleCollapse={toggleCollapse}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
               />
               <Content className="site-layout-background site-layout-custom">
                 <Switch>
