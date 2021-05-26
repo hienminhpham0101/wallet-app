@@ -1,41 +1,26 @@
-import { useEffect, useState } from "react";
-
-// Code from https://usehooks.com/useMedia
-
-export default function useMedia(queries: any, values: any, defaultValue: any) {
-  // State and setter for matched value
+import { useEffect, useState, useMemo } from "react";
+export default function useMedia(
+  queries: string[],
+  values: boolean[],
+  defaultValue: boolean
+) {
   const [value, setValue] = useState(defaultValue);
-
-  // Array containing a media query list for each query
-  const mediaQueryLists = queries.map((q: any) => window.matchMedia(q));
-
-  // State update function
+  const mediaQueryLists = useMemo(
+    () => queries.map((q: string) => window.matchMedia(q)),
+    []
+  );
   const getValue = () => {
-    // Get index of first media query that matches
-    const index = mediaQueryLists.findIndex((mql: any) => mql.matches);
-    // Return related value or defaultValue if none
+    const index: number = mediaQueryLists.findIndex((mql: any) => mql.matches);
     return typeof values[index] !== "undefined" ? values[index] : defaultValue;
   };
-
-  useEffect(
-    () => {
-      // Set the initial value
-      setValue(getValue);
-
-      // Event listener callback
-      // By defining getValue outside of useEffect we ensure that it has ...
-      // ... current values of hook args (as this hook only run on mount/dismount).
-      const handler = () => setValue(getValue);
-
-      // Set a listener for each media query with above handler as callback.
-      mediaQueryLists.forEach((mql: any) => mql.addListener(handler));
-
-      // Remove listeners on cleanup
-      return () =>
-        mediaQueryLists.forEach((mql: any) => mql.removeListener(handler));
-    },
-    [] // Empty array ensures effect is only run on mount and unmount
-  );
-
+  useEffect(() => {
+    setValue(getValue);
+    const handler = () => setValue(getValue);
+    mediaQueryLists.forEach((mql: MediaQueryList) => mql.addListener(handler));
+    return () =>
+      mediaQueryLists.forEach((mql: MediaQueryList) =>
+        mql.removeListener(handler)
+      );
+  }, []);
   return value;
 }

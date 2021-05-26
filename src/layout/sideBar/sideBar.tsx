@@ -29,6 +29,7 @@ export default function SideBar(props: Props) {
         theme="light"
         mode="inline"
         defaultSelectedKeys={[location.pathname]}
+        selectedKeys={[location.pathname]}
       >
         <Menu.Item key="/" icon={<HomeOutlined />}>
           <Link to="/">Home</Link>

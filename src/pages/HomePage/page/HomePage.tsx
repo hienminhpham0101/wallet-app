@@ -3,7 +3,7 @@ import { Button, PageHeader } from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import DataListWallet from "../components/DataListWallet/DataListWallet";
-import { Status } from "../constants/responseStatus/status";
+import { STATUS } from "../constants/responseStatus/status";
 import { IActivities } from "../model/activities";
 import { getActivities } from "../services/httpsClient";
 import "./homePageStyles.scss";
@@ -30,7 +30,7 @@ export default function HomePage() {
     getActivities()
       .then((res: any) => {
         const { status, data } = res;
-        if (status === Status.Success) {
+        if (status === STATUS.SUCCESS) {
           setActivities([...data]);
         }
       })

@@ -17,13 +17,14 @@ import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/pages/HomePage/model/activities";
+import { STATUS } from "../../constants/responseStatus/status";
 import {
   ActivityKey,
   EditableCellProps,
   IColumns,
 } from "src/pages/HomePage/model/columns";
-import { STATUS } from "src/pages/HomePage/model/status";
 import {
+  getActivities,
   removeActivity,
   updateActivity,
 } from "src/pages/HomePage/services/httpsClient";
@@ -97,12 +98,31 @@ function DataListWallet(props: IDataListWallet) {
 
   const handleDateTime = (e: any) => {
     if (e) {
-      const startDate = moment(e[0]).format("MM/DD/YYYY hh:mm");
-      const endDate = moment(e[1]).format("MM/DD/YYYY hh:mm");
-      const rangeDate = activities.filter((activity: IActivities) =>
-        moment(activity.time).isBetween(startDate, endDate)
-      );
-      setData(rangeDate);
+      const startDate: Date = moment(e[0]).toDate();
+      const endDate: Date = moment(e[1]).toDate();
+      getActivities(startDate, endDate).then((res: any) => {
+        const { status, data } = res;
+        if (status === STATUS.SUCCESS) {
+          if (data.length) {
+            const objectInstance = data.map((activity: IActivities) => ({
+              ...activity,
+              key: activity.id,
+              cost: new Intl.NumberFormat().format(activity.cost) + " VND",
+              time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
+            }));
+            setData([...objectInstance]);
+
+            if (data.length > 0) {
+              const total = data.reduce(
+                (pre: number | any, current: number | any) => {
+                  return { cost: pre.cost + current.cost };
+                }
+              );
+              setTotalMoney(total.cost);
+            }
+          }
+        }
+      });
     }
   };
 

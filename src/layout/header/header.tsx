@@ -7,10 +7,8 @@ interface Props {
   MenuFoldOutlined: React.ForwardRefExoticComponent<Pick<any, string>>;
   toggleCollapse: () => void;
   darkMode: boolean;
-
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 export default function Header(props: Props) {
   const { Header } = Layout;
   const {

@@ -5,29 +5,23 @@ import useMedia from "./useMedia";
 function useDarkMode() {
   const [enabledState, setEnabledState] = useLocalStorage(
     "dark-mode-enabled",
-    null
+    false
   );
-
   const prefersDarkMode = usePrefersDarkMode();
-
-  const enabled =
+  const enabled: boolean =
     typeof enabledState !== "undefined" ? enabledState : prefersDarkMode;
-
   useEffect(() => {
     const className = "dark-mode";
-    const element = window.document.body;
+    const element: HTMLElement = window.document.body;
     if (enabled) {
       element.classList.add(className);
     } else {
       element.classList.remove(className);
     }
   }, [enabled]);
-
   return [enabled, setEnabledState];
 }
-
-function usePrefersDarkMode() {
+function usePrefersDarkMode(): boolean {
   return useMedia(["(prefers-color-scheme: dark)"], [true], false);
 }
-
 export default useDarkMode;

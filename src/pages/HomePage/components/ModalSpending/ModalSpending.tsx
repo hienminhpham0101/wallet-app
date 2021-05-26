@@ -14,8 +14,8 @@ import locale from "antd/lib/date-picker/locale/vi_VN";
 import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/pages/HomePage/model/activities";
-import { STATUS } from "src/pages/HomePage/model/status";
 import { addActivity } from "src/pages/HomePage/services/httpsClient";
+import { STATUS } from "../../constants/responseStatus/status";
 import "./ModalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;
