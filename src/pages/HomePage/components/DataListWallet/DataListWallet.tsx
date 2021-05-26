@@ -41,12 +41,12 @@ interface IDataListWallet {
 function DataListWallet(props: IDataListWallet) {
   const { activities, isModalVisible, onCancel, onSubmit, onSuccess } = props;
   const { setLoadingState } = useContext(GlobalLoadingContext);
-  const [data, setData] = useState<IActivities[] | undefined>();
+  const [data, setData] = useState<IActivities[] | undefined>([]);
   const [totalMoney, setTotalMoney] = useState<number>();
   const [, setRowSelected] = useState<IActivities>();
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-
+  const [totalData, settotalData] = useState<number>(0);
   useEffect(() => {
     if (activities) {
       const objectInstance = activities.map((activity: IActivities) => ({
@@ -55,6 +55,7 @@ function DataListWallet(props: IDataListWallet) {
         cost: new Intl.NumberFormat().format(activity.cost) + " VND",
         time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
       }));
+      settotalData(activities.length);
       setData([...objectInstance]);
 
       if (activities.length > 0) {
@@ -97,33 +98,35 @@ function DataListWallet(props: IDataListWallet) {
   };
 
   const handleDateTime = (e: any) => {
-    if (e) {
-      const startDate: Date = moment(e[0]).toDate();
-      const endDate: Date = moment(e[1]).toDate();
-      getActivities(startDate, endDate).then((res: any) => {
-        const { status, data } = res;
-        if (status === STATUS.SUCCESS) {
-          if (data.length) {
-            const objectInstance = data.map((activity: IActivities) => ({
-              ...activity,
-              key: activity.id,
-              cost: new Intl.NumberFormat().format(activity.cost) + " VND",
-              time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
-            }));
-            setData([...objectInstance]);
+    const startDate: Date | null = e ? moment(e[0]).toDate() : null;
+    const endDate: Date | null = e ? moment(e[1]).toDate() : null;
+    getActivities(startDate, endDate).then((res: any) => {
+      const { status, data } = res;
+      if (status === STATUS.SUCCESS) {
+        if (data.length) {
+          const objectInstance = data.map((activity: IActivities) => ({
+            ...activity,
+            key: activity.id,
+            cost: new Intl.NumberFormat().format(activity.cost) + " VND",
+            time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
+          }));
+          setData([...objectInstance]);
+          settotalData(activities.length);
 
-            if (data.length > 0) {
-              const total = data.reduce(
-                (pre: number | any, current: number | any) => {
-                  return { cost: pre.cost + current.cost };
-                }
-              );
-              setTotalMoney(total.cost);
-            }
+          if (data.length > 0) {
+            const total = data.reduce(
+              (pre: number | any, current: number | any) => {
+                return { cost: pre.cost + current.cost };
+              }
+            );
+            setTotalMoney(total.cost);
           }
+        } else {
+          setData([]);
+          setTotalMoney(0);
         }
-      });
-    }
+      }
+    });
   };
 
   const getColumnSearchProps = (dataIndex: string) => ({
@@ -145,30 +148,31 @@ function DataListWallet(props: IDataListWallet) {
             onChange={(e) => handleDateTime(e)}
           />
         ) : (
-          <Input
-            placeholder={`Search ${dataIndex}`}
-            value={selectedKeys[0]}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
-            }
-            onPressEnter={() => handleSearch(confirm)}
-            className="d-block mb-1"
-          />
+          <React.Fragment>
+            <Input
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
+              }
+              onPressEnter={() => handleSearch(confirm)}
+              className="d-block mb-1"
+            />
+            <Space className="mt-1">
+              <Button
+                type="primary"
+                onClick={() => handleSearch(confirm)}
+                icon={<SearchOutlined />}
+                size="small"
+              >
+                Search
+              </Button>
+              <Button onClick={() => handleReset(clearFilters)} size="small">
+                Reset
+              </Button>
+            </Space>
+          </React.Fragment>
         )}
-
-        <Space className="mt-1">
-          <Button
-            type="primary"
-            onClick={() => handleSearch(confirm)}
-            icon={<SearchOutlined />}
-            size="small"
-          >
-            Search
-          </Button>
-          <Button onClick={() => handleReset(clearFilters)} size="small">
-            Reset
-          </Button>
-        </Space>
       </div>
     ),
 
@@ -419,31 +423,41 @@ function DataListWallet(props: IDataListWallet) {
       console.log("Validate Failed:", errInfo);
     }
   };
+  const handleChangePaging = (currentNumber: number, pageSize?: number) => {
+    console.log(currentNumber, pageSize);
+  };
   return (
     <Form form={form} component={false}>
-      {data && data.length && (
-        <Table
-          columns={mergedColumns}
-          dataSource={data}
-          rowClassName="editable-row"
-          summary={summaryActivity}
-          pagination={false}
-          bordered
-          onRow={(record: IActivities) => {
-            return {
-              onClick: () => {
-                setRowSelected(record);
-              },
-            };
-          }}
-          components={{
-            body: {
-              cell: EditableCell,
+      <Table
+        columns={mergedColumns}
+        dataSource={data}
+        rowClassName="editable-row"
+        summary={summaryActivity}
+        size="middle"
+        bordered
+        pagination={{
+          total: totalData,
+          pageSize: 10,
+          onChange: handleChangePaging,
+          showSizeChanger: true,
+          showTotal: (total, range) =>
+            `Showing ${range[0]}-${range[1]} of ${total} items`,
+          size: "default",
+        }}
+        onRow={(record: IActivities) => {
+          return {
+            onClick: () => {
+              setRowSelected(record);
             },
-          }}
-          sticky
-        />
-      )}
+          };
+        }}
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+        sticky
+      />
       <ModalSpending
         isModalVisible={isModalVisible}
         handleSubmit={onSubmit}
