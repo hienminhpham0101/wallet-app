@@ -1,17 +1,11 @@
-import { IActivities } from "./../model/activities";
+import { IActivities, IParamsFilter } from "./../model/activities";
 import { END_POINT } from "./../constants/endPoints/endpoints";
 import axios from "axios";
 const url = "http://localhost:8012";
-export const getActivities = async (
-  startDate?: Date | null,
-  endDate?: Date | null
-) => {
+export const getActivities = async (filters: IParamsFilter) => {
   try {
     const response = await axios.get(`${url}/${END_POINT.activities}`, {
-      params: {
-        startDate,
-        endDate,
-      },
+      params: filters,
     });
     return response;
   } catch (error) {

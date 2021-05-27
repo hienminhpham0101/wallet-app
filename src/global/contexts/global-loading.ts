@@ -7,7 +7,6 @@ export const GlobalLoadingContext = createContext<{
   setLoadingState: (state: LoadingState) => void;
 }>({
   loadingState: "init",
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setLoadingState() {},
 });
 export const GlobalLoadingProvider = GlobalLoadingContext.Provider;

@@ -7,6 +7,7 @@ export default function useMedia(
   const [value, setValue] = useState(defaultValue);
   const mediaQueryLists = useMemo(
     () => queries.map((q: string) => window.matchMedia(q)),
+    // eslint-disable-next-line
     []
   );
   const getValue = () => {
@@ -21,6 +22,7 @@ export default function useMedia(
       mediaQueryLists.forEach((mql: MediaQueryList) =>
         mql.removeListener(handler)
       );
+    // eslint-disable-next-line
   }, []);
   return value;
 }

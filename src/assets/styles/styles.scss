@@ -116,7 +116,8 @@ a.ant-typography,
     background-color: $color-primary10;
 }
 .ant-spin,
-.ant-page-header-back-button:hover {
+.ant-page-header-back-button:hover,
+.ant-table-filter-trigger.active {
     color: $color-primary5;
 }
 .ant-picker-range .ant-picker-active-bar {

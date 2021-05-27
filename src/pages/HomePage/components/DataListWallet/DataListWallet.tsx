@@ -16,8 +16,11 @@ import Title from "antd/lib/typography/Title";
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
-import { IActivities } from "src/pages/HomePage/model/activities";
-import { STATUS } from "../../constants/responseStatus/status";
+import {
+  DefaultSearch,
+  IActivities,
+  IParamsFilter,
+} from "src/pages/HomePage/model/activities";
 import {
   ActivityKey,
   EditableCellProps,
@@ -28,6 +31,7 @@ import {
   removeActivity,
   updateActivity,
 } from "src/pages/HomePage/services/httpsClient";
+import { STATUS } from "../../constants/responseStatus/status";
 import ModalSpending from "../ModalSpending/ModalSpending";
 import "./DataListWalletStyles.scss";
 interface IDataListWallet {
@@ -35,42 +39,49 @@ interface IDataListWallet {
   onCancel: () => void;
   onSubmit: () => void;
   onSuccess: () => void;
-  activities: IActivities[] | any;
 }
 
 function DataListWallet(props: IDataListWallet) {
-  const { activities, isModalVisible, onCancel, onSubmit, onSuccess } = props;
+  const { isModalVisible, onCancel, onSubmit, onSuccess } = props;
   const { setLoadingState } = useContext(GlobalLoadingContext);
   const [data, setData] = useState<IActivities[] | undefined>([]);
   const [totalMoney, setTotalMoney] = useState<number>();
   const [, setRowSelected] = useState<IActivities>();
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-  const [totalData, settotalData] = useState<number>(0);
-  useEffect(() => {
-    if (activities) {
-      const objectInstance = activities.map((activity: IActivities) => ({
-        ...activity,
-        key: activity.id,
-        cost: new Intl.NumberFormat().format(activity.cost) + " VND",
-        time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
-      }));
-      settotalData(activities.length);
-      setData([...objectInstance]);
+  const [totalData, setTotalData] = useState<number>(0);
+  const [filters, setFilters] = useState<IParamsFilter>(DefaultSearch);
 
-      if (activities.length > 0) {
-        const total = activities.reduce(
-          (pre: number | any, current: number | any) => {
-            return { cost: pre.cost + current.cost };
+  useEffect(() => {
+    getActivities(filters).then((res: any) => {
+      const { data, total } = res.data;
+      const { status } = res;
+      if (status === STATUS.SUCCESS) {
+        if (data.length) {
+          const objectInstance = data.map((activity: IActivities) => ({
+            ...activity,
+            key: activity.id,
+            cost: new Intl.NumberFormat().format(activity.cost) + " VND",
+            time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
+          }));
+          setTotalData(total);
+          setData([...objectInstance]);
+
+          if (data.length > 0) {
+            const total = data.reduce(
+              (pre: number | any, current: number | any) => {
+                return { cost: pre.cost + current.cost };
+              }
+            );
+            setTotalMoney(total.cost);
           }
-        );
-        setTotalMoney(total.cost);
+        }
       }
-    }
+    });
     return () => {
       setData([]);
     };
-  }, [activities]);
+  }, [filters]);
 
   const summaryActivity = () => (
     <Table.Summary.Row>
@@ -100,32 +111,12 @@ function DataListWallet(props: IDataListWallet) {
   const handleDateTime = (e: any) => {
     const startDate: Date | null = e ? moment(e[0]).toDate() : null;
     const endDate: Date | null = e ? moment(e[1]).toDate() : null;
-    getActivities(startDate, endDate).then((res: any) => {
-      const { status, data } = res;
-      if (status === STATUS.SUCCESS) {
-        if (data.length) {
-          const objectInstance = data.map((activity: IActivities) => ({
-            ...activity,
-            key: activity.id,
-            cost: new Intl.NumberFormat().format(activity.cost) + " VND",
-            time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
-          }));
-          setData([...objectInstance]);
-          settotalData(activities.length);
-
-          if (data.length > 0) {
-            const total = data.reduce(
-              (pre: number | any, current: number | any) => {
-                return { cost: pre.cost + current.cost };
-              }
-            );
-            setTotalMoney(total.cost);
-          }
-        } else {
-          setData([]);
-          setTotalMoney(0);
-        }
-      }
+    setFilters((pre) => {
+      return {
+        ...pre,
+        startDate,
+        endDate,
+      };
     });
   };
 
@@ -304,6 +295,8 @@ function DataListWallet(props: IDataListWallet) {
             message.success("Delete spending successfully !");
           }, 700);
           onSubmit();
+        } else {
+          message.error("Error, please try again !");
         }
       })
       .catch((err) => {
@@ -423,8 +416,14 @@ function DataListWallet(props: IDataListWallet) {
       console.log("Validate Failed:", errInfo);
     }
   };
-  const handleChangePaging = (currentNumber: number, pageSize?: number) => {
-    console.log(currentNumber, pageSize);
+  const handleChangePaging = (page: number, pageSize?: number) => {
+    setFilters((pre) => {
+      return {
+        ...pre,
+        page,
+        pageSize,
+      };
+    });
   };
   return (
     <Form form={form} component={false}>
@@ -437,7 +436,7 @@ function DataListWallet(props: IDataListWallet) {
         bordered
         pagination={{
           total: totalData,
-          pageSize: 10,
+          pageSize: filters.pageSize,
           onChange: handleChangePaging,
           showSizeChanger: true,
           showTotal: (total, range) =>
