@@ -1,6 +1,5 @@
 @import "../../shared/variables.scss";
 .trigger {
-    padding: 0 24px;
     font-size: 18px;
     line-height: 64px;
     cursor: pointer;
@@ -13,8 +12,17 @@
 
 .site-layout .site-layout-background {
     background: $color-white;
-    padding: 0;
+    padding: 0 20px;
+    box-shadow: "rgb(100 100 111 / 20%) 0px 7px 29px";
 }
 .ant-switch-checked {
     background-color: $color-primary5;
+}
+.side-item {
+    margin-right: 10px;
+}
+.img-user {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }

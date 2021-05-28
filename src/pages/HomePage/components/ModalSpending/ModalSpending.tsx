@@ -104,7 +104,12 @@ export default function ModalSpending(props: Props) {
         </Button>,
       ]}
     >
-      <Form form={form} layout="vertical" name="expenditure-form">
+      <Form
+        form={form}
+        layout="vertical"
+        name="expenditure-form"
+        className="mb-5"
+      >
         <Form.Item
           name="expenditure"
           label="Expenditure :"
@@ -157,7 +162,6 @@ export default function ModalSpending(props: Props) {
         <Form.Item name="note" label="Note :">
           <Input.TextArea rows={3} showCount maxLength={250} allowClear />
         </Form.Item>
-        <div style={{ marginBottom: "20px" }}></div>
       </Form>
     </Modal>
   );

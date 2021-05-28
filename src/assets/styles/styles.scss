@@ -23,6 +23,20 @@
 .mt-1 {
     margin-top: 0.5rem;
 }
+.mt-5 {
+    margin-top: 1.25rem;
+}
+.mb-5 {
+    margin-bottom: 1.25rem;
+}
+.px-0 {
+    padding-left: 0;
+    padding-right: 0;
+}
+.py-0 {
+    padding-top: 0;
+    padding-bottom: 0;
+}
 .global-loading {
     position: fixed;
     z-index: 9999;
@@ -39,11 +53,14 @@
     margin-left: 250px;
     min-height: 100vh;
 }
+.collapsed .ant-layout-header {
+    width: calc(100% - 80px);
+}
 .ant-layout-header {
     position: fixed;
-    width: 100%;
     z-index: 100;
     background: $color-white;
+    width: calc(100% - 250px);
 }
 .site-layout-custom {
     margin: 24px 16px;
@@ -147,6 +164,10 @@ a.ant-typography,
         background-color: $color-orange;
         border-color: $color-orange;
     }
+    .ant-table-cell-fix-right,
+    .ant-pagination-total-text {
+        color: $color-white;
+    }
 }
 .ant-pagination-item-active {
     border-color: $color-primary4;
@@ -173,4 +194,7 @@ a.ant-typography,
 .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
     border-color: $color-primary4;
     box-shadow: $box-shadow-primary4;
+}
+.border-none {
+    border: none;
 }

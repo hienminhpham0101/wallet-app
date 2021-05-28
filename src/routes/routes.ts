@@ -2,6 +2,7 @@ import React, { ComponentType } from "react";
 const HomePage = React.lazy(() => import("../pages/HomePage/page/HomePage"));
 const Contact = React.lazy(() => import("../pages/Contact/page/Contact"));
 const NotFound = React.lazy(() => import("../pages/404 Page/NotFound"));
+const Login = React.lazy(() => import("../pages/Login/Login"));
 export interface IRoutes {
   id: number;
   path: string;
@@ -9,6 +10,12 @@ export interface IRoutes {
   exact?: boolean;
 }
 const Routes: IRoutes[] = [
+  {
+    id: 0,
+    path: "/login",
+    Component: Login,
+    exact: true,
+  },
   {
     id: 1,
     path: "/",

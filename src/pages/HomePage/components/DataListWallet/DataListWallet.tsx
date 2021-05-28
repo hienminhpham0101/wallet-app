@@ -4,7 +4,6 @@ import {
   DatePicker,
   Form,
   Input,
-  InputNumber,
   message,
   Popconfirm,
   Space,
@@ -21,16 +20,13 @@ import {
   IActivities,
   IParamsFilter,
 } from "src/pages/HomePage/model/activities";
-import {
-  ActivityKey,
-  EditableCellProps,
-  IColumns,
-} from "src/pages/HomePage/model/columns";
+import { ActivityKey, IColumns } from "src/pages/HomePage/model/columns";
 import {
   getActivities,
   removeActivity,
   updateActivity,
 } from "src/pages/HomePage/services/httpsClient";
+import { EditableCell } from "../../constants/columns/columns";
 import { STATUS } from "../../constants/responseStatus/status";
 import ModalSpending from "../ModalSpending/ModalSpending";
 import "./DataListWalletStyles.scss";
@@ -43,19 +39,19 @@ interface IDataListWallet {
 
 function DataListWallet(props: IDataListWallet) {
   const { isModalVisible, onCancel, onSubmit, onSuccess } = props;
-  const { setLoadingState } = useContext(GlobalLoadingContext);
   const [data, setData] = useState<IActivities[] | undefined>([]);
+  const { setLoadingState } = useContext(GlobalLoadingContext);
   const [totalMoney, setTotalMoney] = useState<number>();
-  const [, setRowSelected] = useState<IActivities>();
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
   const [totalData, setTotalData] = useState<number>(0);
   const [filters, setFilters] = useState<IParamsFilter>(DefaultSearch);
+  const [forcedReload, setForcedReload] = useState(false);
 
   useEffect(() => {
     getActivities(filters).then((res: any) => {
-      const { data, total } = res.data;
       const { status } = res;
+      const { data, total } = res.data;
       if (status === STATUS.SUCCESS) {
         if (data.length) {
           const objectInstance = data.map((activity: IActivities) => ({
@@ -66,7 +62,6 @@ function DataListWallet(props: IDataListWallet) {
           }));
           setTotalData(total);
           setData([...objectInstance]);
-
           if (data.length > 0) {
             const total = data.reduce(
               (pre: number | any, current: number | any) => {
@@ -75,30 +70,15 @@ function DataListWallet(props: IDataListWallet) {
             );
             setTotalMoney(total.cost);
           }
+        } else {
+          message.error("Failed to load !");
         }
       }
     });
     return () => {
       setData([]);
     };
-  }, [filters]);
-
-  const summaryActivity = () => (
-    <Table.Summary.Row>
-      <Table.Summary.Cell index={0}>
-        <Title level={5}>Total:</Title>
-      </Table.Summary.Cell>
-      <Table.Summary.Cell index={1} colSpan={4}>
-        {totalMoney && (
-          <Title level={5}>
-            <Text strong type="danger">
-              {new Intl.NumberFormat().format(totalMoney) + " VND"}
-            </Text>
-          </Title>
-        )}
-      </Table.Summary.Cell>
-    </Table.Summary.Row>
-  );
+  }, [filters, forcedReload]);
 
   const handleSearch = (confirm: () => void) => {
     confirm();
@@ -286,88 +266,6 @@ function DataListWallet(props: IDataListWallet) {
     };
   });
 
-  const handleDelete = (activityId: React.Key) => {
-    setLoadingState("loading");
-    removeActivity(activityId)
-      .then((res) => {
-        if (res?.status === STATUS.SUCCESS) {
-          setTimeout(() => {
-            message.success("Delete spending successfully !");
-          }, 700);
-          onSubmit();
-        } else {
-          message.error("Error, please try again !");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        message.error("Error, please try again !");
-      })
-      .finally(() => {
-        setLoadingState("idle");
-      });
-  };
-  function disabledDate(current: any) {
-    return current && current.valueOf() > Date.now();
-  }
-  const EditableCell: React.FC<EditableCellProps> = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    required,
-    ...restProps
-  }) => {
-    let inputNode: JSX.Element = <></>;
-    switch (inputType) {
-      case "text":
-        inputNode = <Input />;
-        break;
-      case "number":
-        inputNode = (
-          <InputNumber
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-          />
-        );
-        break;
-      case "date":
-        inputNode = (
-          <DatePicker
-            disabledDate={(current) => disabledDate(current)}
-            format="MM/DD/YYYY HH:mm:ss"
-            placeholder="Select date"
-            showTime
-          />
-        );
-        break;
-    }
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item
-            name={dataIndex}
-            className="mb-0"
-            rules={[
-              {
-                required: required ? true : false,
-                message: `Please Input ${title}!`,
-              },
-            ]}
-          >
-            {inputNode}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
   const isEditing = (record: IActivities) => record.key === editingKey;
 
   const edit = (record: Partial<IActivities> & { key: React.Key }) => {
@@ -380,6 +278,29 @@ function DataListWallet(props: IDataListWallet) {
   };
   const cancel = () => {
     setEditingKey("");
+  };
+
+  const handleDelete = (activityId: React.Key) => {
+    setLoadingState("loading");
+    removeActivity(activityId)
+      .then((res) => {
+        if (res?.status === STATUS.SUCCESS) {
+          setTimeout(() => {
+            message.success("Delete spending successfully !");
+          }, 700);
+          onSubmit();
+          onReload();
+        } else {
+          message.error("Error, please try again !");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Error, please try again !");
+      })
+      .finally(() => {
+        setLoadingState("idle");
+      });
   };
 
   const save = async (key: string) => {
@@ -398,6 +319,7 @@ function DataListWallet(props: IDataListWallet) {
               message.success("Update spending successfully !");
             }, 800);
             onSuccess();
+            onReload();
           } else {
             message.error("Error, please try again !");
           }
@@ -425,6 +347,27 @@ function DataListWallet(props: IDataListWallet) {
       };
     });
   };
+  const onReload = () => {
+    setForcedReload((pre) => !pre);
+  };
+
+  const summaryActivity = () => (
+    <Table.Summary.Row>
+      <Table.Summary.Cell index={0}>
+        <Title level={5}>Total:</Title>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={1} colSpan={4}>
+        {totalMoney && (
+          <Title level={5}>
+            <Text strong type="danger">
+              {new Intl.NumberFormat().format(totalMoney) + " VND"}
+            </Text>
+          </Title>
+        )}
+      </Table.Summary.Cell>
+    </Table.Summary.Row>
+  );
+
   return (
     <Form form={form} component={false}>
       <Table
@@ -442,13 +385,6 @@ function DataListWallet(props: IDataListWallet) {
           showTotal: (total, range) =>
             `Showing ${range[0]}-${range[1]} of ${total} items`,
           size: "default",
-        }}
-        onRow={(record: IActivities) => {
-          return {
-            onClick: () => {
-              setRowSelected(record);
-            },
-          };
         }}
         components={{
           body: {
