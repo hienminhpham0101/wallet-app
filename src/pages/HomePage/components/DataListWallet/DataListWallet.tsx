@@ -70,8 +70,6 @@ function DataListWallet(props: IDataListWallet) {
             );
             setTotalMoney(total.cost);
           }
-        } else {
-          message.error("Failed to load !");
         }
       }
     });

@@ -1,7 +1,7 @@
+import { url } from "../../../constants/urls/urls";
 import { IActivities, IParamsFilter } from "./../model/activities";
-import { END_POINT } from "./../constants/endPoints/endpoints";
+import { END_POINT } from "../../../constants/endPoints/endpoints";
 import axios from "axios";
-const url = "http://localhost:8012";
 export const getActivities = async (filters: IParamsFilter) => {
   try {
     const response = await axios.get(`${url}/${END_POINT.activities}`, {
@@ -13,15 +13,8 @@ export const getActivities = async (filters: IParamsFilter) => {
   }
 };
 export const addActivity = async (activity: IActivities) => {
-  try {
-    const response = await axios.post(
-      `${url}/${END_POINT.activities}`,
-      activity
-    );
-    return response;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await axios.post(`${url}/${END_POINT.activities}`, activity);
+  return response;
 };
 export const removeActivity = async (activityId: React.Key) => {
   try {

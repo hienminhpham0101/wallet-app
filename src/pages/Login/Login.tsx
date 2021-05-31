@@ -1,8 +1,13 @@
-import React from "react";
 import GoogleLogin from "react-google-login";
+import getTokenFromLocalStorage from "src/auth/services/getTokenFromLocalStorage";
+import setTokenToLocalStorage from "src/auth/services/setTokenToLocalStorage";
+import { addUser } from "src/auth/services/users";
 
 const responseGoogle = (response: any) => {
-  console.log(response);
+  const { email, name, googleId, imageUrl } = response.profileObj;
+  const { tokenId } = response;
+  setTokenToLocalStorage(tokenId);
+  addUser({ email, name, googleId, imageUrl }, googleId);
 };
 export default function Login() {
   return (

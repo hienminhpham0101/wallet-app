@@ -36,11 +36,11 @@ export default function ModalSpending(props: Props) {
             message.success("Create spending successfully !");
           }, 800);
           handleSubmit();
-        } else {
-          message.error("Error, please try again !");
         }
       })
       .catch((err) => {
+        const { data } = err.response;
+        message.error(data);
         console.log(err);
       })
       .finally(() => {
