@@ -13,8 +13,15 @@ export const getActivities = async (filters: IParamsFilter) => {
   }
 };
 export const addActivity = async (activity: IActivities) => {
-  const response = await axios.post(`${url}/${END_POINT.activities}`, activity);
-  return response;
+  try {
+    const response = await axios.post(
+      `${url}/${END_POINT.activities}`,
+      activity
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 };
 export const removeActivity = async (activityId: React.Key) => {
   try {

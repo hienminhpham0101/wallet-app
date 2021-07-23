@@ -27,19 +27,17 @@ import {
   updateActivity,
 } from "src/pages/HomePage/services/httpsClient";
 import { EditableCell } from "../../constants/columns/columns";
-import { STATUS } from "../../constants/responseStatus/status";
 import ModalSpending from "../ModalSpending/ModalSpending";
 import "./DataListWalletStyles.scss";
 interface IDataListWallet {
   isModalVisible: boolean;
   onCancel: () => void;
   onSubmit: () => void;
-  onSuccess: () => void;
 }
 
 function DataListWallet(props: IDataListWallet) {
-  const { isModalVisible, onCancel, onSubmit, onSuccess } = props;
-  const [data, setData] = useState<IActivities[] | undefined>([]);
+  const { isModalVisible, onCancel, onSubmit } = props;
+  const [data, setData] = useState<IActivities[]>([]);
   const { setLoadingState } = useContext(GlobalLoadingContext);
   const [totalMoney, setTotalMoney] = useState<number>();
   const [form] = Form.useForm();
@@ -49,30 +47,34 @@ function DataListWallet(props: IDataListWallet) {
   const [forcedReload, setForcedReload] = useState(false);
 
   useEffect(() => {
-    getActivities(filters).then((res: any) => {
-      const { status } = res;
-      const { data, total } = res.data;
-      if (status === STATUS.SUCCESS) {
-        if (data.length) {
-          const objectInstance = data.map((activity: IActivities) => ({
-            ...activity,
-            key: activity.id,
-            cost: new Intl.NumberFormat().format(activity.cost) + " VND",
-            time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
-          }));
-          setTotalData(total);
-          setData([...objectInstance]);
-          if (data.length > 0) {
-            const total = data.reduce(
-              (pre: number | any, current: number | any) => {
-                return { cost: pre.cost + current.cost };
-              }
-            );
-            setTotalMoney(total.cost);
+    getActivities(filters)
+      .then((res: any) => {
+        const { status } = res;
+        if (status === 200) {
+          const { data, total } = res.data;
+          if (data.length) {
+            const objectInstance = data.map((activity: IActivities) => ({
+              ...activity,
+              key: activity.id,
+              cost: new Intl.NumberFormat().format(activity.cost) + " VND",
+              time: moment(activity.time).format("MM/DD/YYYY hh:mm"),
+            }));
+            setTotalData(total);
+            setData([...objectInstance]);
+            if (data.length > 0) {
+              const total = data.reduce(
+                (pre: number | any, current: number | any) => {
+                  return { cost: pre.cost + current.cost };
+                }
+              );
+              setTotalMoney(total.cost);
+            }
           }
         }
-      }
-    });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     return () => {
       setData([]);
     };
@@ -282,14 +284,12 @@ function DataListWallet(props: IDataListWallet) {
     setLoadingState("loading");
     removeActivity(activityId)
       .then((res) => {
-        if (res?.status === STATUS.SUCCESS) {
+        if (res?.status === 200) {
           setTimeout(() => {
             message.success("Delete spending successfully !");
           }, 700);
           onSubmit();
           onReload();
-        } else {
-          message.error("Error, please try again !");
         }
       })
       .catch((err) => {
@@ -312,14 +312,12 @@ function DataListWallet(props: IDataListWallet) {
       setLoadingState("loading");
       updateActivity(key, { ...objectInstance, id: key })
         .then((res) => {
-          if (res?.status === STATUS.UPDATED) {
+          if (res?.status === 204) {
             setTimeout(() => {
               message.success("Update spending successfully !");
-            }, 800);
-            onSuccess();
+            }, 500);
+            onSubmit();
             onReload();
-          } else {
-            message.error("Error, please try again !");
           }
           setEditingKey("");
         })
@@ -330,12 +328,13 @@ function DataListWallet(props: IDataListWallet) {
         .finally(() => {
           setTimeout(() => {
             setLoadingState("idle");
-          }, 600);
+          }, 500);
         });
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
   };
+
   const handleChangePaging = (page: number, pageSize?: number) => {
     setFilters((pre) => {
       return {
@@ -345,6 +344,7 @@ function DataListWallet(props: IDataListWallet) {
       };
     });
   };
+
   const onReload = () => {
     setForcedReload((pre) => !pre);
   };
@@ -395,6 +395,7 @@ function DataListWallet(props: IDataListWallet) {
         isModalVisible={isModalVisible}
         handleSubmit={onSubmit}
         handleCancel={onCancel}
+        handleReload={onReload}
       />
     </Form>
   );
