@@ -62,11 +62,7 @@ export default function Header(props: Props) {
           placement="bottomCenter"
           className="px-0 py-0 border-none"
           icon={
-            <img
-              className="img-user px-0 py-0 border-none"
-              src="https://lh3.googleusercontent.com/a-/AOh14GhAqKIrnuHhPxTmIEQezfNl4lhSu_IQHlpS_mU17w=s96-c"
-              alt="user"
-            />
+            <img className="img-user px-0 py-0 border-none" src="" alt="user" />
           }
         >
           Hien Pham

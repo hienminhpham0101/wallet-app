@@ -15,27 +15,29 @@ import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/pages/HomePage/model/activities";
 import { addActivity } from "src/pages/HomePage/services/httpsClient";
-import { STATUS } from "../../constants/responseStatus/status";
 import "./ModalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;
   handleSubmit: () => void;
   handleCancel: () => void;
+  handleReload: () => void;
 }
 
 export default function ModalSpending(props: Props) {
-  const { isModalVisible, handleCancel, handleSubmit } = props;
+  const { isModalVisible, handleCancel, handleSubmit, handleReload } = props;
   const [form] = Form.useForm();
   const { setLoadingState } = React.useContext(GlobalLoadingContext);
+
   const onCreate = (activity: IActivities) => {
     setLoadingState("loading");
     addActivity(activity)
       .then((res) => {
-        if (res?.status === STATUS.CREATED) {
+        if (res?.status === 200) {
           setTimeout(() => {
             message.success("Create spending successfully !");
-          }, 800);
+          }, 500);
           handleSubmit();
+          handleReload();
         }
       })
       .catch((err) => {
@@ -47,6 +49,7 @@ export default function ModalSpending(props: Props) {
         setLoadingState("idle");
       });
   };
+
   const onSubmit = () => {
     form
       .validateFields()
@@ -59,9 +62,11 @@ export default function ModalSpending(props: Props) {
         console.log("Validate Failed:", info);
       });
   };
+
   const onReset = () => {
     form.resetFields();
   };
+
   const onCancel = () => {
     const { expenditure, time, cost } = form.getFieldsValue([
       "expenditure",
@@ -81,6 +86,7 @@ export default function ModalSpending(props: Props) {
     form.resetFields();
     handleCancel();
   };
+
   return (
     <Modal
       visible={isModalVisible}

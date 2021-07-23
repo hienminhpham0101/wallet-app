@@ -1,4 +1,4 @@
-export interface IUser {
+export interface IAuth {
   email: string;
   name: string;
   googleId: string;

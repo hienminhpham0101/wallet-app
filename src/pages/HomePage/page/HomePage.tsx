@@ -8,9 +8,6 @@ export default function HomePage() {
   const handleSubmit = () => {
     setIsModalVisible(false);
   };
-  const handleSuccess = () => {
-    setIsModalVisible(false);
-  };
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -37,7 +34,6 @@ export default function HomePage() {
         isModalVisible={isModalVisible}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        onSuccess={handleSuccess}
       />
     </React.Fragment>
   );
