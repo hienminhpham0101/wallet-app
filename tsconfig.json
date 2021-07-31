@@ -15,40 +15,18 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "."
-  },
-  "exclude": ["node_modules", "typings"],
-  "include": ["src"],
-  "@typescript-eslint/naming-convention": [
-    "error",
-    {
-      "selector": "function",
-      "format": ["camelCase", "PascalCase"]
-    },
-    {
-      "selector": "default",
-      "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
-    },
-
-    {
-      "selector": "variable",
-      "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
-    },
-    {
-      "selector": "parameter",
-      "format": ["camelCase"],
-      "leadingUnderscore": "allow"
-    },
-    {
-      "selector": "memberLike",
-      "modifiers": ["private"],
-      "format": ["camelCase"],
-      "leadingUnderscore": "allow"
-    },
-    {
-      "selector": "typeLike",
-      "format": ["PascalCase"]
+    "baseUrl": ".",
+    "types": [],
+    "paths": {
+      "components/*": ["src/components/*"]
     }
+  },
+  "@typescript-eslint/no-empty-interface": "warn",
+  "exclude": [
+    "node_modules",
+    "./node_modules",
+    "./node_modules/*",
+    "./node_modules/@types/node/index.d.ts"
   ],
-  "@typescript-eslint/no-empty-interface": "warn"
+  "include": ["src"]
 }

@@ -1,8 +1,8 @@
 import React, { ComponentType } from "react";
-const HomePage = React.lazy(() => import("../pages/HomePage/page/HomePage"));
-const Contact = React.lazy(() => import("../pages/Contact/page/Contact"));
-const NotFound = React.lazy(() => import("../pages/404 Page/NotFound"));
-const Login = React.lazy(() => import("../pages/Login/Login"));
+const HomePage = React.lazy(() => import("../pages/homePage/page/homePage"));
+const Contact = React.lazy(() => import("../pages/contact/page/contact"));
+const NotFound = React.lazy(() => import("../pages/404_page/notFound"));
+const Login = React.lazy(() => import("../pages/login/login"));
 export interface IRoutes {
   id: number;
   path: string;

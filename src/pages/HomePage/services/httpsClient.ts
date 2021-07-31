@@ -1,5 +1,5 @@
 import { url } from "../../../constants/urls/urls";
-import { IActivities, IParamsFilter } from "./../model/activities";
+import { IActivities, IParamsFilter } from "../model/activities";
 import { END_POINT } from "../../../constants/endPoints/endpoints";
 import axios from "axios";
 export const getActivities = async (filters: IParamsFilter) => {

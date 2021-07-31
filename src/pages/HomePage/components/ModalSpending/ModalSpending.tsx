@@ -11,11 +11,12 @@ import {
   Row,
 } from "antd";
 import locale from "antd/lib/date-picker/locale/vi_VN";
+import moment from "moment";
 import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
-import { IActivities } from "src/pages/HomePage/model/activities";
-import { addActivity } from "src/pages/HomePage/services/httpsClient";
-import "./ModalSpendingStyles.scss";
+import { IActivities } from "src/pages/homePage/model/activities";
+import { addActivity } from "src/pages/homePage/services/httpsClient";
+import "./modalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;
   handleSubmit: () => void;
@@ -141,7 +142,12 @@ export default function ModalSpending(props: Props) {
                 },
               ]}
             >
-              <DatePicker locale={locale} placeholder="Select date" showTime />
+              <DatePicker
+                defaultValue={moment()}
+                locale={locale}
+                placeholder="Select date"
+                showTime
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
