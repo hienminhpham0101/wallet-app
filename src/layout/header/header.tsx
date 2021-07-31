@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import "./headerStyles.scss";
 import { BellOutlined, UserOutlined } from "@ant-design/icons";
 import { UserContext } from "src/global/contexts/usersContext";
-import Login from "../../pages/login/Login";
+import Login from "src/pages/login/login";
 interface Props {
   collapsed: boolean;
   MenuUnfoldOutlined: React.ForwardRefExoticComponent<Pick<any, string>>;
