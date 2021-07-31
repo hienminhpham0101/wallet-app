@@ -1,7 +1,9 @@
 import { Button, Dropdown, Layout, Menu, message, Switch } from "antd";
-import React from "react";
+import React, { useContext } from "react";
 import "./headerStyles.scss";
 import { BellOutlined, UserOutlined } from "@ant-design/icons";
+import { UserContext } from "src/global/contexts/usersContext";
+import Login from "src/pages/login/login";
 interface Props {
   collapsed: boolean;
   MenuUnfoldOutlined: React.ForwardRefExoticComponent<Pick<any, string>>;
@@ -11,6 +13,7 @@ interface Props {
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function Header(props: Props) {
+  const userData = useContext(UserContext);
   const { Header } = Layout;
   const {
     collapsed,
@@ -22,7 +25,6 @@ export default function Header(props: Props) {
   } = props;
   function handleMenuClick(e: any) {
     message.info("Click on menu item.");
-    console.log("click", e);
   }
 
   const menu = (
@@ -43,6 +45,7 @@ export default function Header(props: Props) {
       <div className="trigger" onClick={toggleCollapse}>
         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </div>
+      <Login />
       <div className="side-right">
         <Switch
           defaultChecked={darkMode}
@@ -62,10 +65,14 @@ export default function Header(props: Props) {
           placement="bottomCenter"
           className="px-0 py-0 border-none"
           icon={
-            <img className="img-user px-0 py-0 border-none" src="" alt="user" />
+            <img
+              className="img-user px-0 py-0 border-none"
+              src={userData.userData.imageUrl}
+              alt="user"
+            />
           }
         >
-          Hien Pham
+          {userData.userData.name}
         </Dropdown.Button>
       </div>
     </Header>

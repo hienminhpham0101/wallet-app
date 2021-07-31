@@ -1,7 +1,7 @@
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { Button, PageHeader } from "antd";
 import React from "react";
-import DataListWallet from "../components/DataListWallet/DataListWallet";
+import { DataListWallet } from "../components/dataListWallet/dataListWallet";
 import "./homePageStyles.scss";
 export default function HomePage() {
   const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
@@ -17,7 +17,6 @@ export default function HomePage() {
         ghost={false}
         onBack={() => window.history.back()}
         title="Title"
-        subTitle="This is a subtitle"
         extra={[
           <Button
             type="primary"

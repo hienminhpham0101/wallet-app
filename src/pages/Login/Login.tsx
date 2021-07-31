@@ -1,74 +1,35 @@
-import { message } from "antd";
-import Modal from "antd/lib/modal/Modal";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import GoogleLogin from "react-google-login";
-import { Redirect } from "react-router";
-import { IAuth } from "src/auth/models/users";
-import getTokenFromLocalStorage from "src/auth/services/getTokenFromLocalStorage";
-import setTokenToLocalStorage from "src/auth/services/setTokenToLocalStorage";
-import { authorization } from "src/auth/services/users";
+import { UserContext } from "src/global/contexts/usersContext";
 
 export default function Login() {
-  const [auth, setAuth] = useState<IAuth>({
-    email: "",
-    googleId: "",
-    imageUrl: "",
-    name: "",
-  });
-  const [token] = useState<string | null>(() => getTokenFromLocalStorage());
-  const [isVisible, setIsVisible] = useState<boolean>(true);
-
+  const userData = useContext(UserContext);
   const responseGoogle = (response: any) => {
-    const { email, name, googleId, imageUrl } = response.profileObj;
-    const { tokenId } = response;
-    if (tokenId) {
-      setAuth({ email, name, googleId, imageUrl });
-      setTokenToLocalStorage(tokenId);
+    if (response) {
+      const { email, name, googleId, imageUrl } = response.profileObj;
+      userData.setUserData({
+        email,
+        name,
+        googleId,
+        imageUrl,
+      });
     }
   };
   useEffect(() => {
-    if (token) {
-      if (auth.googleId) {
-        authorization(auth)
-          .then((res: any) => {
-            const { status } = res;
-            if (status === 200 || status === 204) {
-              <Redirect push to="/" />;
-            }
-          })
-          .catch((err) => {
-            const { data } = err.response;
-            message.error(data);
-          });
-      }
-    }
-    return () => {
-      setAuth({
-        email: "",
-        googleId: "",
-        imageUrl: "",
-        name: "",
-      });
-      setIsVisible(false);
-    };
-  }, [auth.googleId]);
+    fetch("https://5fd8e8c17e05f000170d32a3.mockapi.io/Users")
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  }, [userData]);
   return (
     <React.Fragment>
-      <Modal
-        title="Authorization"
-        width="400px"
-        destroyOnClose={true}
-        visible={isVisible}
-      >
-        <GoogleLogin
-          clientId="504842184480-3k9vabpfk0rkbd01jrit5imn9vadn1m5.apps.googleusercontent.com"
-          buttonText="Login"
-          onSuccess={responseGoogle}
-          onFailure={responseGoogle}
-          cookiePolicy={"single_host_origin"}
-          isSignedIn={true}
-        />
-      </Modal>
+      <GoogleLogin
+        clientId="504842184480-3k9vabpfk0rkbd01jrit5imn9vadn1m5.apps.googleusercontent.com"
+        buttonText="Login"
+        onSuccess={responseGoogle}
+        onFailure={responseGoogle}
+        cookiePolicy={"single_host_origin"}
+        isSignedIn={true}
+      />
     </React.Fragment>
   );
 }

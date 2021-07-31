@@ -4,7 +4,12 @@ import "antd/dist/antd.css";
 import React, { ComponentType, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./assets/styles/styles.scss";
+import { IAuth } from "./auth/models/users";
 import { GlobalLoadingProvider } from "./global/contexts/global-loading";
+import {
+  initialCurrentUser,
+  UserContextProvider,
+} from "./global/contexts/usersContext";
 import useDarkMode from "./hooks/useDarkMode";
 import Header from "./layout/header/header";
 import SideBar from "./layout/sideBar/sideBar";
@@ -22,10 +27,11 @@ function App() {
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
   };
-  const [loadingState, setLoadingState] =
-    useState<"init" | "loading" | "idle">("init");
+  const [loadingState, setLoadingState] = useState<"init" | "loading" | "idle">(
+    "init"
+  );
   const [darkMode, setDarkMode] = useDarkMode();
-
+  const [userData, setUserData] = useState<IAuth>(initialCurrentUser);
   return (
     <GlobalLoadingProvider
       value={{
@@ -33,42 +39,44 @@ function App() {
         setLoadingState,
       }}
     >
-      <Layout className={`layout ${collapsed ? "collapsed" : null}`}>
-        <React.Suspense
-          fallback={
-            <div className="global-loading">
-              <Spin size="large" tip="Loading ..." />
-            </div>
-          }
-        >
-          <Router>
-            <SideBar collapsed={collapsed} />
-            <Layout className="site-layout">
-              <Header
-                collapsed={collapsed}
-                MenuFoldOutlined={MenuFoldOutlined}
-                MenuUnfoldOutlined={MenuUnfoldOutlined}
-                toggleCollapse={toggleCollapse}
-                darkMode={darkMode}
-                setDarkMode={setDarkMode}
-              />
-              <Content className="site-layout-background site-layout-custom">
-                <Switch>
-                  {Routes &&
-                    Routes.map((route: IRoutes) => (
-                      <Route
-                        key={route.id}
-                        exact={route.exact}
-                        path={route.path}
-                        component={route.Component}
-                      />
-                    ))}
-                </Switch>
-              </Content>
-            </Layout>
-          </Router>
-        </React.Suspense>
-      </Layout>
+      <UserContextProvider value={{ userData, setUserData }}>
+        <Layout className={`layout ${collapsed ? "collapsed" : null}`}>
+          <React.Suspense
+            fallback={
+              <div className="global-loading">
+                <Spin size="large" tip="Loading ..." />
+              </div>
+            }
+          >
+            <Router>
+              <SideBar collapsed={collapsed} />
+              <Layout className="site-layout">
+                <Header
+                  collapsed={collapsed}
+                  MenuFoldOutlined={MenuFoldOutlined}
+                  MenuUnfoldOutlined={MenuUnfoldOutlined}
+                  toggleCollapse={toggleCollapse}
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                />
+                <Content className="site-layout-background site-layout-custom">
+                  <Switch>
+                    {Routes &&
+                      Routes.map((route: IRoutes) => (
+                        <Route
+                          key={route.id}
+                          exact={route.exact}
+                          path={route.path}
+                          component={route.Component}
+                        />
+                      ))}
+                  </Switch>
+                </Content>
+              </Layout>
+            </Router>
+          </React.Suspense>
+        </Layout>
+      </UserContextProvider>
       {loadingState === "loading" && (
         <div className="global-loading">
           <Spin size="large" tip="Loading..." />

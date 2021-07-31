@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 type LoadingState = "init" | "loading" | "idle";
 
@@ -10,6 +10,3 @@ export const GlobalLoadingContext = createContext<{
   setLoadingState() {},
 });
 export const GlobalLoadingProvider = GlobalLoadingContext.Provider;
-export const GlobalLoadingConsumer = GlobalLoadingContext.Consumer;
-
-export const useGlobalLoading = () => useContext(GlobalLoadingContext);

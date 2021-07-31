@@ -19,23 +19,23 @@ import {
   DefaultSearch,
   IActivities,
   IParamsFilter,
-} from "src/pages/HomePage/model/activities";
-import { ActivityKey, IColumns } from "src/pages/HomePage/model/columns";
+} from "src/pages/homePage/model/activities";
+import { ActivityKey, IColumns } from "src/pages/homePage/model/columns";
 import {
   getActivities,
   removeActivity,
   updateActivity,
-} from "src/pages/HomePage/services/httpsClient";
+} from "src/pages/homePage/services/httpsClient";
 import { EditableCell } from "../../constants/columns/columns";
-import ModalSpending from "../ModalSpending/ModalSpending";
-import "./DataListWalletStyles.scss";
+import ModalSpending from "../modalSpending/modalSpending";
+import "./dataListWalletStyles.scss";
 interface IDataListWallet {
   isModalVisible: boolean;
   onCancel: () => void;
   onSubmit: () => void;
 }
 
-function DataListWallet(props: IDataListWallet) {
+function DataListWalletComponent(props: IDataListWallet) {
   const { isModalVisible, onCancel, onSubmit } = props;
   const [data, setData] = useState<IActivities[]>([]);
   const { setLoadingState } = useContext(GlobalLoadingContext);
@@ -400,4 +400,4 @@ function DataListWallet(props: IDataListWallet) {
     </Form>
   );
 }
-export default DataListWallet;
+export const DataListWallet = React.memo(DataListWalletComponent);
