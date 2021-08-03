@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "./sideBarStyles.scss";
 import { useLocation } from "react-router-dom";
 import { Logo } from "../../shared/icons";
+import React from "react";
 interface Props {
   collapsed: boolean;
 }
