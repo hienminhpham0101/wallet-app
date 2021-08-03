@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { IAuth } from "src/auth/models/users";
 export const initialCurrentUser = {
   email: "",
@@ -15,3 +15,4 @@ export const UserContext = createContext<{
   setUserData() {},
 });
 export const UserContextProvider = UserContext.Provider;
+export const useAuth = () => useContext(UserContext);
