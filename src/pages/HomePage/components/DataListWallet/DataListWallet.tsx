@@ -20,13 +20,13 @@ import {
   IActivities,
   IParamsFilter,
 } from "src/pages/homePage/model/activities";
+import { EditableCell } from "../../constants/columns/columns";
+import { ActivityKey, IColumns } from "../../model/columns";
 import {
   getActivities,
   removeActivity,
   updateActivity,
-} from "src/pages/homePage/services/httpsClient";
-import { EditableCell } from "../../constants/columns/columns";
-import { ActivityKey, IColumns } from "../../model/columns";
+} from "../../services/services";
 import ModalSpending from "../modalSpending/modalSpending";
 import "./dataListWalletStyles.scss";
 interface IDataListWallet {

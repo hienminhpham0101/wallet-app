@@ -31,7 +31,6 @@ const Routes: IRoutes[] = [
   {
     path: "*",
     Component: NotFound,
-    guard: AuthGuard,
   },
 ];
 export default Routes;

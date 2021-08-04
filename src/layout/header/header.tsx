@@ -1,7 +1,8 @@
 import { BellOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Dropdown, Layout, Menu, message, Switch } from "antd";
-import React, { useContext } from "react";
-import { UserContext } from "src/global/contexts/usersContext";
+import { Button, Dropdown, Layout, Menu, Switch } from "antd";
+import firebase from "firebase";
+import React from "react";
+import { useAuth } from "src/global/contexts/usersContext";
 import "./headerStyles.scss";
 interface Props {
   collapsed: boolean;
@@ -12,10 +13,9 @@ interface Props {
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function Header(props: Props) {
-  const userData = useContext(UserContext);
-  console.log(userData);
-
+  const { userData } = useAuth();
   const { Header } = Layout;
+
   const {
     collapsed,
     MenuUnfoldOutlined,
@@ -24,9 +24,10 @@ export default function Header(props: Props) {
     darkMode,
     setDarkMode,
   } = props;
-  function handleMenuClick(e: any) {
-    message.info("Click on menu item.");
-  }
+
+  const handleSignOut = () => {
+    firebase.auth().signOut();
+  };
 
   return (
     <Header className="site-layout-background d-flex justify-content-between align-items-center">
@@ -49,15 +50,13 @@ export default function Header(props: Props) {
         />
         <Dropdown.Button
           overlay={
-            <Menu onClick={handleMenuClick}>
-              <Menu.Item key="1" icon={<UserOutlined />}>
-                1st menu item
-              </Menu.Item>
-              <Menu.Item key="2" icon={<UserOutlined />}>
-                2nd menu item
-              </Menu.Item>
-              <Menu.Item key="3" icon={<UserOutlined />}>
-                3rd menu item
+            <Menu>
+              <Menu.Item
+                key="1"
+                onClick={handleSignOut}
+                icon={<UserOutlined />}
+              >
+                Sign Out
               </Menu.Item>
             </Menu>
           }
@@ -66,12 +65,12 @@ export default function Header(props: Props) {
           icon={
             <img
               className="img-user px-0 py-0 border-none"
-              src={userData.userData.imageUrl}
+              src={userData.photoURL}
               alt="user"
             />
           }
         >
-          {userData.userData.name}
+          {userData.displayName}
         </Dropdown.Button>
       </div>
     </Header>

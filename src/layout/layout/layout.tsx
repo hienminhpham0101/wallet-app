@@ -6,7 +6,7 @@ import Header from "../header/header";
 import SideBar from "../sideBar/sideBar";
 const { Content } = Layout;
 interface IProps {
-  children: ReactElement<any>;
+  children: ReactElement<JSX.Element>;
 }
 export default function LayoutSection(props: IProps) {
   const { children } = props;

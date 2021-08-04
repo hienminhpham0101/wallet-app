@@ -1,6 +1,6 @@
+import axios from "axios";
 import { END_POINT } from "../../constants/endPoints/endpoints";
 import { url } from "../../constants/urls/urls";
-import axios from "axios";
 import { IAuth } from "./../models/users";
 export const authorization = async (user: IAuth | undefined) => {
   try {
