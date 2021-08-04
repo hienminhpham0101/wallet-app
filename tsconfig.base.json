@@ -15,8 +15,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
-    "types": []
+    "types": [],
+    "paths": {
+      "@app/*": ["src/*"],
+      "@env/*": ["env/*"]
+    }
   },
   "@typescript-eslint/no-empty-interface": "warn",
   "exclude": [
