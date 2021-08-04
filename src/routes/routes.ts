@@ -1,5 +1,5 @@
+import AuthGuard from "src/auth/guards/guardAuth";
 import React, { ComponentType } from "react";
-import AuthGuard from "src/guards/guardAuth";
 import Login from "src/pages/login/login";
 const HomePage = React.lazy(() => import("src/pages/homePage/page/homePage"));
 const Contact = React.lazy(() => import("src/pages/contact/page/contact"));

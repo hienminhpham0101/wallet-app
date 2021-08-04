@@ -20,13 +20,13 @@ import {
   IActivities,
   IParamsFilter,
 } from "src/pages/homePage/model/activities";
-import { ActivityKey, IColumns } from "src/pages/homePage/model/columns";
 import {
   getActivities,
   removeActivity,
   updateActivity,
 } from "src/pages/homePage/services/httpsClient";
 import { EditableCell } from "../../constants/columns/columns";
+import { ActivityKey, IColumns } from "../../model/columns";
 import ModalSpending from "../modalSpending/modalSpending";
 import "./dataListWalletStyles.scss";
 interface IDataListWallet {
@@ -72,7 +72,7 @@ function DataListWalletComponent(props: IDataListWallet) {
           }
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log(err);
       });
     return () => {
@@ -91,7 +91,7 @@ function DataListWalletComponent(props: IDataListWallet) {
   const handleDateTime = (e: any) => {
     const startDate: Date | null = e ? moment(e[0]).toDate() : null;
     const endDate: Date | null = e ? moment(e[1]).toDate() : null;
-    setFilters((pre) => {
+    setFilters((pre: any) => {
       return {
         ...pre,
         startDate,
@@ -283,7 +283,7 @@ function DataListWalletComponent(props: IDataListWallet) {
   const handleDelete = (activityId: React.Key) => {
     setLoadingState("loading");
     removeActivity(activityId)
-      .then((res) => {
+      .then((res: any) => {
         if (res?.status === 200) {
           setTimeout(() => {
             message.success("Delete spending successfully !");
@@ -292,7 +292,7 @@ function DataListWalletComponent(props: IDataListWallet) {
           onReload();
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log(err);
         message.error("Error, please try again !");
       })
@@ -311,7 +311,7 @@ function DataListWalletComponent(props: IDataListWallet) {
       };
       setLoadingState("loading");
       updateActivity(key, { ...objectInstance, id: key })
-        .then((res) => {
+        .then((res: any) => {
           if (res?.status === 204) {
             setTimeout(() => {
               message.success("Update spending successfully !");
@@ -321,7 +321,7 @@ function DataListWalletComponent(props: IDataListWallet) {
           }
           setEditingKey("");
         })
-        .catch((err) => {
+        .catch((err: any) => {
           console.log(err);
           message.error("Error, please try again !");
         })
@@ -336,7 +336,7 @@ function DataListWalletComponent(props: IDataListWallet) {
   };
 
   const handleChangePaging = (page: number, pageSize?: number) => {
-    setFilters((pre) => {
+    setFilters((pre: any) => {
       return {
         ...pre,
         page,
