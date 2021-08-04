@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,18 +19,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": [],
-    "paths": {
-      "@app/*": ["src/*"],
-      "@env/*": ["env/*"]
-    }
+    "baseUrl": "."
   },
-  "@typescript-eslint/no-empty-interface": "warn",
-  "exclude": [
-    "node_modules",
-    "./node_modules",
-    "./node_modules/*",
-    "./node_modules/@types/node/index.d.ts"
-  ],
-  "include": ["src"]
+  "include": [
+    "src/*"
+  ]
 }

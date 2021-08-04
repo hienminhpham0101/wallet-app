@@ -15,7 +15,7 @@ import moment from "moment";
 import React from "react";
 import { GlobalLoadingContext } from "src/global/contexts/global-loading";
 import { IActivities } from "src/pages/homePage/model/activities";
-import { addActivity } from "src/pages/homePage/services/httpsClient";
+import { addActivity } from "../../services/services";
 import "./modalSpendingStyles.scss";
 interface Props {
   isModalVisible: boolean;

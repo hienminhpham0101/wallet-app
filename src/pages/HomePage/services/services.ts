@@ -1,10 +1,10 @@
-import { url } from "../../../constants/urls/urls";
+import { END_POINT } from "./../../../constants/endPoints/endpoints";
+import { url } from "./../../../constants/urls/urls";
+import httpsClient from "src/shared/services/httpsClient";
 import { IActivities, IParamsFilter } from "../model/activities";
-import { END_POINT } from "../../../constants/endPoints/endpoints";
-import axios from "axios";
 export const getActivities = async (filters: IParamsFilter) => {
   try {
-    const response = await axios.get(`${url}/${END_POINT.activities}`, {
+    const response = await httpsClient.get(`${url}/${END_POINT.activities}`, {
       params: filters,
     });
     return response;
@@ -14,7 +14,7 @@ export const getActivities = async (filters: IParamsFilter) => {
 };
 export const addActivity = async (activity: IActivities) => {
   try {
-    const response = await axios.post(
+    const response = await httpsClient.post(
       `${url}/${END_POINT.activities}`,
       activity
     );
@@ -25,7 +25,7 @@ export const addActivity = async (activity: IActivities) => {
 };
 export const removeActivity = async (activityId: React.Key) => {
   try {
-    const response = await axios.delete(
+    const response = await httpsClient.delete(
       `${url}/${END_POINT.activities}/${activityId}`
     );
     return response;
@@ -39,7 +39,7 @@ export const updateActivity = async (
   data: IActivities
 ) => {
   try {
-    const response = await axios.put(
+    const response = await httpsClient.put(
       `${url}/${END_POINT.activities}/${activityId}`,
       data
     );

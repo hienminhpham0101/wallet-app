@@ -1,10 +1,9 @@
 import { createContext, useContext } from "react";
 import { IAuth } from "src/auth/models/users";
 export const initialCurrentUser = {
+  displayName: "",
   email: "",
-  googleId: "",
-  imageUrl: "",
-  name: "",
+  photoURL: "",
 };
 
 export const UserContext = createContext<{

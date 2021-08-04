@@ -1,10 +1,13 @@
 import { ReactElement } from "react";
 import { Redirect } from "react-router-dom";
 import { useAuth } from "src/global/contexts/usersContext";
-export function AuthGuard({ props }: ReactElement<any>) {
+interface IProps {
+  children: ReactElement<JSX.Element>;
+}
+export function AuthGuard(props: IProps) {
   const { userData } = useAuth();
 
-  if (!userData.googleId) {
+  if (!userData.email) {
     return <Redirect to="/login" />;
   }
   return props.children;

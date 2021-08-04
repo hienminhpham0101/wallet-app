@@ -1,6 +1,8 @@
 export interface IAuth {
+  displayName: string;
   email: string;
-  name: string;
-  googleId: string;
-  imageUrl: string;
+  phoneNumber?: string;
+  photoURL: string;
+  providerId?: string;
+  uid?: string;
 }
