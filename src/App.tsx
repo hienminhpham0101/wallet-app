@@ -5,6 +5,7 @@ import { Fragment, Suspense, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./assets/styles/styles.scss";
 import { GlobalLoadingProvider } from "./global/contexts/global-loading";
+import { ProgressBar } from "./global/progressBar/progressBar";
 import {
   initialCurrentUser,
   UserContextProvider,
@@ -67,11 +68,7 @@ function App() {
                   <Route key={route.path} exact={route.exact} path={route.path}>
                     <Guard key="auth">
                       <Suspense
-                        fallback={
-                          <div className="global-loading">
-                            <Spin size="large" tip="Loading ..." />
-                          </div>
-                        }
+                        fallback={<ProgressBar showProgress={route.progress} />}
                       >
                         {isSignedIn ? (
                           <LayoutSection>

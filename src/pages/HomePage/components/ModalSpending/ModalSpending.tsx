@@ -33,10 +33,8 @@ export default function ModalSpending(props: Props) {
     setLoadingState("loading");
     addActivity(activity)
       .then((res) => {
-        if (res?.status === 200) {
-          setTimeout(() => {
-            message.success("Create spending successfully !");
-          }, 500);
+        if (res?.status === 201) {
+          message.success("Create spending successfully !");
           handleSubmit();
           handleReload();
         }

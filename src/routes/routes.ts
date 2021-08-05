@@ -9,6 +9,7 @@ export interface IRoutes {
   Component: React.LazyExoticComponent<ComponentType<any>> | ComponentType<any>;
   exact?: boolean;
   guard?: React.LazyExoticComponent<ComponentType<any>> | ComponentType<any>;
+  progress?: boolean;
 }
 const Routes: IRoutes[] = [
   {
@@ -21,16 +22,19 @@ const Routes: IRoutes[] = [
     Component: HomePage,
     exact: true,
     guard: AuthGuard,
+    progress: true,
   },
   {
     path: "/contact",
     Component: Contact,
     exact: true,
     guard: AuthGuard,
+    progress: true,
   },
   {
     path: "*",
     Component: NotFound,
+    progress: true,
   },
 ];
 export default Routes;
