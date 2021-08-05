@@ -6,11 +6,11 @@ const getFirebaseToken = async () => {
   const currentUser = firebase.auth().currentUser;
   if (currentUser) return currentUser.getIdToken();
 
-  // Not logged in
-  const hasRememberedAccount = localStorage.getItem(
-    "firebaseui::rememberedAccounts"
-  );
-  if (!hasRememberedAccount) return null;
+  // // Not logged in
+  // const hasRememberedAccount = localStorage.getItem(
+  //   "firebaseui::rememberedAccounts"
+  // );
+  // if (!hasRememberedAccount) return null;
 
   // Logged in but current user is not fetched --> wait (10s)
   return new Promise((resolve, reject) => {
@@ -36,10 +36,8 @@ const getFirebaseToken = async () => {
   });
 };
 
-// Set up default config for http requests here
-// Please have a look at here `https://github.com/axios/axios#request- config` for the full list of configs
 const httpsClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_FIREBASE_API,
   headers: {
     "content-type": "application/json",
   },
@@ -57,14 +55,9 @@ httpsClient.interceptors.request.use(async (config) => {
 
 httpsClient.interceptors.response.use(
   (response) => {
-    if (response && response.data) {
-      return response.data;
-    }
-
     return response;
   },
   (error) => {
-    // Handle errors
     throw error;
   }
 );

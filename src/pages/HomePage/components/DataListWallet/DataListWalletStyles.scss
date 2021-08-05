@@ -1,3 +1,4 @@
+@import "../../../../shared/variables/variables.scss";
 .editable-row .ant-form-item-explain {
     position: absolute;
     top: 100%;
@@ -14,4 +15,25 @@
 }
 .ant-table-header {
     top: 64px !important;
+}
+.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.ant-checkbox:hover .ant-checkbox-inner,
+.ant-checkbox-input:focus + .ant-checkbox-inner,
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover {
+    border-color: $color-primary4;
+}
+.ant-checkbox-checked::after {
+    border: 1px solid $color-primary4;
+}
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: $color-primary4;
+    border-color: $color-primary4;
+}
+.ant-checkbox-indeterminate .ant-checkbox-inner::after {
+    background-color: $color-primary4;
+}
+
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+    box-shadow: $box-shadow-primary4;
 }

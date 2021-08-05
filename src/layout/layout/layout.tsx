@@ -1,6 +1,6 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout } from "antd";
-import React, { ReactElement, useState } from "react";
+import { ReactElement, useState } from "react";
 import useDarkMode from "src/hooks/useDarkMode";
 import Header from "../header/header";
 import SideBar from "../sideBar/sideBar";
@@ -10,7 +10,7 @@ interface IProps {
 }
 export default function LayoutSection(props: IProps) {
   const { children } = props;
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(true);
   const [darkMode, setDarkMode] = useDarkMode();
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
