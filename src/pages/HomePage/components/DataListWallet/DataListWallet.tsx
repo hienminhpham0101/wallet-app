@@ -45,10 +45,12 @@ function DataListWalletComponent(props: IDataListWallet) {
   const [totalData, setTotalData] = useState<number>(0);
   const [filters, setFilters] = useState<IParamsFilter>(DefaultSearch);
   const [forcedReload, setForcedReload] = useState(false);
-
+  const [selectedRowKey, setSelectedRowKey] = useState<React.Key[]>([]);
   useEffect(() => {
     getActivities(filters)
       .then((res: any) => {
+        console.log(res);
+
         const { status } = res;
         if (status === 200) {
           const { data, total } = res.data;
@@ -75,9 +77,6 @@ function DataListWalletComponent(props: IDataListWallet) {
       .catch((err: any) => {
         console.log(err);
       });
-    return () => {
-      setData([]);
-    };
   }, [filters, forcedReload]);
 
   const handleSearch = (confirm: () => void) => {
@@ -127,7 +126,7 @@ function DataListWalletComponent(props: IDataListWallet) {
                 setSelectedKeys(e.target.value ? [e.target.value.trim()] : [])
               }
               onPressEnter={() => handleSearch(confirm)}
-              className="d-block mb-1"
+              allowClear
             />
             <Space className="mt-1">
               <Button
@@ -351,10 +350,12 @@ function DataListWalletComponent(props: IDataListWallet) {
 
   const summaryActivity = () => (
     <Table.Summary.Row>
-      <Table.Summary.Cell index={0}>
+      <Table.Summary.Cell index={0} />
+      <Table.Summary.Cell index={1}>
+        {" "}
         <Title level={5}>Total:</Title>
       </Table.Summary.Cell>
-      <Table.Summary.Cell index={1} colSpan={4}>
+      <Table.Summary.Cell index={2} colSpan={4}>
         {totalMoney && (
           <Title level={5}>
             <Text strong type="danger">
@@ -375,6 +376,11 @@ function DataListWalletComponent(props: IDataListWallet) {
         summary={summaryActivity}
         size="middle"
         bordered
+        rowSelection={{
+          type: "checkbox",
+          onChange: (selectedRowKeys: React.Key[]) =>
+            setSelectedRowKey(selectedRowKeys),
+        }}
         pagination={{
           total: totalData,
           pageSize: filters.pageSize,

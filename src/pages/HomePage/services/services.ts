@@ -1,5 +1,5 @@
-import { END_POINT } from "./../../../constants/endPoints/endpoints";
-import { url } from "./../../../constants/urls/urls";
+import { END_POINT } from "@app/constants/endPoints/endpoints";
+import { url } from "@app/constants/urls/urls";
 import httpsClient from "src/shared/services/httpsClient";
 import { IActivities, IParamsFilter } from "../model/activities";
 export const getActivities = async (filters: IParamsFilter) => {
