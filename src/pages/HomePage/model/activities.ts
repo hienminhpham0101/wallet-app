@@ -1,6 +1,6 @@
 export interface IActivities {
   id?: number | string;
-  key: string;
+  key: any;
   expenditure: string;
   time: any;
   cost: number;

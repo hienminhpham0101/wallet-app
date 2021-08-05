@@ -1,4 +1,4 @@
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   Button,
   DatePicker,
@@ -46,11 +46,10 @@ function DataListWalletComponent(props: IDataListWallet) {
   const [filters, setFilters] = useState<IParamsFilter>(DefaultSearch);
   const [forcedReload, setForcedReload] = useState(false);
   const [selectedRowKey, setSelectedRowKey] = useState<React.Key[]>([]);
+
   useEffect(() => {
     getActivities(filters)
       .then((res: any) => {
-        console.log(res);
-
         const { status } = res;
         if (status === 200) {
           const { data, total } = res.data;
@@ -279,14 +278,12 @@ function DataListWalletComponent(props: IDataListWallet) {
     setEditingKey("");
   };
 
-  const handleDelete = (activityId: React.Key) => {
+  const handleDelete = (activityId: React.Key[]) => {
     setLoadingState("loading");
     removeActivity(activityId)
       .then((res: any) => {
         if (res?.status === 200) {
-          setTimeout(() => {
-            message.success("Delete spending successfully !");
-          }, 700);
+          message.success("Delete spending successfully !");
           onSubmit();
           onReload();
         }
@@ -312,9 +309,7 @@ function DataListWalletComponent(props: IDataListWallet) {
       updateActivity(key, { ...objectInstance, id: key })
         .then((res: any) => {
           if (res?.status === 204) {
-            setTimeout(() => {
-              message.success("Update spending successfully !");
-            }, 500);
+            message.success("Update spending successfully !");
             onSubmit();
             onReload();
           }
@@ -325,9 +320,7 @@ function DataListWalletComponent(props: IDataListWallet) {
           message.error("Error, please try again !");
         })
         .finally(() => {
-          setTimeout(() => {
-            setLoadingState("idle");
-          }, 500);
+          setLoadingState("idle");
         });
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
@@ -369,6 +362,15 @@ function DataListWalletComponent(props: IDataListWallet) {
 
   return (
     <Form form={form} component={false}>
+      <Button
+        className="mb-1"
+        icon={<DeleteOutlined />}
+        disabled={selectedRowKey.length === 0}
+        danger
+        onClick={() => handleDelete(selectedRowKey)}
+      >
+        Delete Activities
+      </Button>
       <Table
         columns={mergedColumns}
         dataSource={data}
