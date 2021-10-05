@@ -49,6 +49,7 @@ function App() {
       unregisterAuthObserver();
     };
   }, []);
+  console.log("branch dev");
 
   return (
     <GlobalLoadingProvider
