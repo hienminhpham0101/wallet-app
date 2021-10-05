@@ -50,6 +50,7 @@ function App() {
     };
   }, []);
   console.log("branch dev");
+  console.log("branch dev2");
 
   return (
     <GlobalLoadingProvider
