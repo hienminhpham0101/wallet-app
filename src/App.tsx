@@ -51,6 +51,8 @@ function App() {
   }, []);
   console.log("branch dev");
 
+  console.log("branch dev v2");
+
   return (
     <GlobalLoadingProvider
       value={{
